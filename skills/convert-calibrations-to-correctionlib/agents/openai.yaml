@@ -1,0 +1,4 @@
+interface:
+  display_name: "Convert Calibrations to CorrectionLib"
+  short_description: "ATLAS conversions with shared code and reference validation"
+  default_prompt: "Use $convert-calibrations-to-correctionlib to migrate these calibrations and systematic uncertainties into composable payloads and validate them against the original tools."
