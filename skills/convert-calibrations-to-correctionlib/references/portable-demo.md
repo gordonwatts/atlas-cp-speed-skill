@@ -16,7 +16,7 @@ A PEP 723 script can declare `requires-python` and `dependencies` in its header.
 
 Choose the input users actually have, such as the original ROOT analysis file, and read it directly in bounded chunks. Avoid requiring a prepared NumPy/NPZ conversion merely to demonstrate the correction package. Validate required branches and preserve event/object identity and collection-dependent features. Run every requested nominal, kinematic and weight-only state. For a histogram example, use an explicit numeric axis and a category axis covering the states; state whether fills are weighted, what selections apply, and why weight-only variations may repeat nominal kinematic bins. Save axis names/edges, category labels, regular counts, flow counts and useful per-state summaries, then print the output path, processed events/objects, total entries and category list. Refuse to overwrite an existing result or put each run in a new directory.
 
-## Verify and present the demonstration
+## Verify and measure the demonstration
 
 Check the runnable bundle after extraction, including its file list and checksums. Exercise a small sample from real input against the frozen reference where possible, then run the complete intended input. Compare category coverage, histogram contents and weight/selection summaries, not only successful exit. Keep the acceptance claim separate from the demo's aggregate-output check.
 

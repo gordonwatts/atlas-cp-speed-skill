@@ -2,7 +2,7 @@
 
 ## Independent authority
 
-Completion requires every required numerical acceptance check to pass; unresolved required failures keep the conversion experimental regardless of speed or ordinary-sample agreement. Record failures and missing checks in the report and `<task> - log.txt`. Missing reference information cannot count as a pass. If it blocks a required check, only an explicit user acceptance of that limitation permits completion with a documented narrower claim.
+Completion requires every required numerical acceptance check to pass; unresolved required failures keep the conversion experimental regardless of speed or ordinary-sample agreement. Record failures and missing checks in the acceptance records and task log. Missing reference information cannot count as a pass. If it blocks a required check, only an explicit user acceptance of that limitation permits completion with a documented narrower claim.
 
 Freeze the original release/configuration/input and run it unchanged. Never make a rewritten backend the sole oracle. A second implementation is useful for diagnosis, but two paths sharing the same bug can agree.
 
@@ -29,7 +29,7 @@ Do not automatically widen tolerances, remove failing objects or replace invalid
 
 ## Acceptance contract
 
-Read the established project acceptance configuration before choosing tolerances. Preserve approved limits when continuing work; keep exact numbers and their rationale in project configuration and reports rather than treating one campaign's values as universal defaults. Define quantity-specific absolute/relative tolerances and native units, wrap phi differences, and require exact identities, counts, coverage, selections and recorded discrete statuses. Record missing reference observables explicitly. Check B and C independently against A on the common selected PHYSLITE input; checkpoint parity between replacement versions is a separate regression check.
+Read the established project acceptance configuration before choosing tolerances. Preserve approved limits when continuing work; keep exact numbers and their rationale in project configuration and acceptance records rather than treating one campaign's values as universal defaults. Define quantity-specific absolute/relative tolerances and native units, wrap phi differences, and require exact identities, counts, coverage, selections and recorded discrete statuses. Record missing reference observables explicitly. Check B and C independently against A on the common selected PHYSLITE input; checkpoint parity between replacement versions is a separate regression check.
 
 ## Benchmark after correctness
 
@@ -61,7 +61,7 @@ The difference versus sample size can distinguish fixed startup/shutdown cost fr
 
 ### Isolate components and mechanisms
 
-Replace one package or stage at a time while retaining the original implementations of the others, with identical inputs, outputs and resolved states. Verify which libraries actually loaded, rather than trusting setup-script names. Keep ABI-dependent factories, dictionaries and implementation libraries consistent; local ROOT-specific cautions are in [ATLAS lessons](atlas-lessons.md#integration-and-tooling-lessons). Validate each successful isolation job against the original reference outside the timer when that matches the benchmark scope.
+Replace one package or stage at a time while retaining the original implementations of the others, with identical inputs, outputs and resolved states. Verify which libraries actually loaded, rather than trusting setup-script names. Keep ABI-dependent factories, dictionaries and implementation libraries consistent; local ROOT-specific cautions are in [ATLAS lessons](atlas-lessons.md#framework-and-tooling-boundaries). Validate each successful isolation job against the original reference outside the timer when that matches the benchmark scope.
 
 Report spread and observed host activity. Do not add noisy package differences into an exact overhead budget: drift, shared initialization and interactions can prevent additivity. Do not stop unrelated workloads to obtain a quiet machine without authorization. CPU affinity can make native microbenchmarks more comparable; record whether workflow jobs used the same affinity and cache policy.
 
@@ -109,4 +109,4 @@ Use exclusive instruction counts when quantifying allocation functions; inclusiv
 
 ## Evidence package
 
-Retain raw comparisons/timings, resolved configuration, input and payload hashes, source revision/patches, dependency versions and command recipes. Write a concise report linking these artifacts and distinguishing numerical, architectural and performance evidence. Validation metadata should reflect completed checks, not merely successful conversion or build.
+Retain raw comparisons/timings, resolved configuration, input and payload hashes, source revision/patches, dependency versions and command recipes. Record CPU model, physical/logical cores, host memory, OS/virtualization and guest-visible memory where applicable; distinguish machine capacity from each run's CPU policy and measured peak memory. Validation metadata should reflect completed checks, not merely successful conversion or build. Use the [report and talk guide](report-and-talk-guide.md) when turning this evidence into deliverables.
