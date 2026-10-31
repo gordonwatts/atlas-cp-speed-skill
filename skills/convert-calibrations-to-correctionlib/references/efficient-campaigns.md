@@ -84,4 +84,3 @@ These are discovery links, not evidence that a moving branch matches the install
 - Final wheel uses a stale extension or a release library outside the wheel: fail freshness/isolation preflight before the full package campaign.
 
 See [validation and timing](validation-and-timing.md) for numerical requirements and [portable packaging](portable-demo.md) for delivery requirements. This reference changes work sequencing and reuse decisions, not their acceptance thresholds.
-
