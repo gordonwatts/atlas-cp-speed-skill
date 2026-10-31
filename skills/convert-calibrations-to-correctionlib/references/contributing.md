@@ -17,7 +17,7 @@ Useful scenario checks during final review:
 - A fresh calibration uses text coefficients, interpolated ROOT tables and a model file. Does the skill prompt complete dependency tracing rather than copying only the tables?
 - Two rewritten paths agree but both disagree with the original tool on a boundary. Does the workflow retain the original authority and diagnose the first divergence?
 - The requested uncertainty model is unavailable. Does the agent disclose the supported model rather than claim full coverage?
-- A graph needs explicit float rounding and shared intermediates. Does the design use existing nodes or external shared code, recording a useful new node only as a future opportunity?
+- A graph needs explicit float rounding and shared intermediates. Does the design use existing nodes or implement and register new nodes, validate their invocation through CorrectionLib in both B and C, and record version/build requirements rather than fall back to an external physics backend?
 - The reference lacks status branches. Does the report limit its claim and seek independent probes?
 - A diagnostic columnar workflow is faster/slower than an earlier framework job. Does the report account for timing scope and variability before attributing the difference to the evaluator?
 - A replacement is slower and loads a large payload. Does the agent distinguish fixed cost from sample-dependent work, verify the libraries in component-isolation jobs, and retain per-run validation?
@@ -36,7 +36,7 @@ Run expensive full physics validation only when required by the task or changed 
 
 For deck-building updates, also check these scenarios:
 
-- The speaker asks whether external inference is called by CorrectionLib. Does the explanation trace real callers and data flow, starting at the public entry point, rather than repeat a dependency list?
+- The speaker asks how inference is called by CorrectionLib. Does the explanation trace the public entry point through the registered node to its numerical-library dependency, distinguishing historical external inference from the required B/C architecture?
 - A histogram slide contains diagnostic recording and validation helpers. Does the revision show loading and a clear fill loop, label its adaptation and omissions, and distinguish kinematic from weight-only systematics?
 - The speaker manually edited the deck after the outline was written. Does the revision preserve those edits, use native hanging lists and equations, and disclose a renderer that cannot verify the equations?
 - A talk needs commit links but only source publication was authorized. Does the workflow preserve implementation history, exclude presentation assets, distinguish local from public references, and avoid claiming a standalone repository is a fork?

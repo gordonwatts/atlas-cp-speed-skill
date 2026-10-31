@@ -8,9 +8,9 @@ Check CompoundCorrection's ordered scalar application, input updates, output acc
 
 CorrectionLib's C++ evaluator executes loaded definitions. Batch bindings do not establish SIMD, GPU execution or specialized code generation. Verify performance properties separately.
 
-When asked what the library contributes, identify actual executed nodes and give a concrete composition example from the current implementation. Distinguish table searches, formula evaluation, transforms and sequential compositions from the physics retained in shared C++. Exported interpolation formulas are numerical calculations, not merely packaging machinery; explain who executes them.
+When asked what the library contributes, identify actual executed nodes and give a concrete composition example from the current implementation. Distinguish table searches, formula evaluation, transforms and sequential compositions from physics implemented inside custom CorrectionLib nodes. Exported interpolation formulas are numerical calculations, not merely packaging machinery; explain who executes them.
 
-Record external numerical stages explicitly. Trace NNJVT inference separately from JVT scale-factor/efficiency/error lookups. Inspect available operations in the selected version and preserve source inference semantics; do not assume inference is external or claim it was moved out of CorrectionLib without evidence from the actual callers.
+Record numerical libraries called by nodes explicitly. Trace NNJVT inference separately from JVT scale-factor/efficiency/error lookups, showing the CorrectionLib node that invokes each calculation. Inspect available operations in the selected version and preserve source inference semantics. If a historical implementation ran inference outside CorrectionLib, identify it as a historical boundary rather than the required architecture for paths B and C.
 
 Inspect how the selected Formula implementation handles `parser: "TFormula"`: expression syntax does not imply ROOT's TFormula runtime. Distinguish load-time parsing, interpreted expression-tree evaluation and specialized compiled code. Trace Python bindings to the native core before describing execution behavior.
 
@@ -18,9 +18,9 @@ When explaining or authoring a formula, distinguish declared runtime `inputs` fr
 
 ## Choose calculation placement and reusable operations
 
-For stages chosen for declarative representation, place interpolation choices, response inverses, flavour/pile-up expressions, group combinations, systematic signs, validity and stage order in payload definitions. Table and hybrid migrations may retain these rules in shared C++ when measured runtime performance supports that placement; document the division and evidence as required by SKILL.md. Cache only where declared dependencies permit reuse. For example, original-direction truth matching can remain unchanged while momentum-dependent tagging features change under a jet variation.
+Express interpolation choices, response inverses, flavour/pile-up expressions, group combinations, systematic signs, validity and stage order using existing CorrectionLib nodes or custom nodes configured by the payload. C++ implementations of these rules must execute behind those nodes; measured performance can guide node implementation and granularity, but does not justify a separate physics backend. Document the division and evidence as required by SKILL.md. Cache only where declared dependencies permit reuse. For example, original-direction truth matching can remain unchanged while momentum-dependent tagging features change under a jet variation.
 
-Use authoring helpers that expand into existing nodes. This workflow does not add new CorrectionLib nodes or extend its schema/parser/evaluator for missing operations. Implement unsupported calculations outside CorrectionLib and record useful candidate nodes as unimplemented future opportunities in the report and task log. Never present external operations as upstream schema capabilities.
+Use authoring helpers that expand into supported nodes where they suffice. For missing operations, implement and register custom nodes through the extension mechanism in the selected CorrectionLib source, following SKILL.md. Define the node's inputs, outputs, configuration, numerical/status semantics and runtime dependencies; validate payload loading and invocation through CorrectionLib. Distinguish these versioned extensions from upstream schema capabilities. Proposed nodes that are not implemented cannot satisfy an active recipe dependency.
 
 ## Distinguish definitions from execution reuse
 
@@ -32,9 +32,9 @@ Describe three separate forms of reuse:
 
 Check the actual call graph across requested outputs and variations. A complete per-state pipeline may recompute nominal calibration for every state even when it calls a shared nominal graph. A staged runner can compute nominal once yet still repeat systematic calculations in a later diagnostic phase. Preserve numerical ordering while identifying work that can safely be shared; recompute descendants affected by changed inputs.
 
-When comparing architectures, explain the practical change: table lookup plus handwritten physics requires changing C++ for a formula change; a payload-defined recipe can change through regeneration when existing generic operations suffice. Count named reusable stages separately from component helpers expanded during authoring. A dense register-building script does not by itself provide a readable physicist-facing authoring interface.
+When comparing architectures, explain the practical change: historical table lookup plus external handwritten physics requires changing that external C++; a payload-defined recipe can change through regeneration when existing generic operations suffice. Custom-node semantics may still require a C++ rebuild, but those nodes execute through CorrectionLib. Count named reusable stages separately from component helpers expanded during authoring. A dense register-building script does not by itself provide a readable physicist-facing authoring interface.
 
-Reusable authoring and interpreted execution are independent choices. Distinguish definitions lowered to supported nodes from external compiled calculations; do not imply a compiler or graph engine exists without inspecting it. Retain source mapping, explicit precision/branch semantics and reference validation when changing backends. Measure dispatch/traversal cost rather than inferring an end-to-end effect. Evaluate whether standard CorrectionLib is best used as the table/formula layer while shared compiled code composes the larger calculation.
+Reusable authoring and interpreted execution are independent choices. Distinguish definitions lowered to existing nodes from compiled custom-node implementations; do not imply a compiler or graph engine exists without inspecting it. Retain source mapping, explicit precision/branch semantics and reference validation when changing node implementations. Measure dispatch/traversal cost rather than inferring an end-to-end effect. Fusion or compiled composition must remain behind CorrectionLib nodes.
 
 ## Authoring experience
 
@@ -91,7 +91,7 @@ Define empty collection/chunk behavior and result shapes, absent-primary-object 
 
 Describe, explain, compare and provenance views should derive from the executed definitions: show stages and requirements, trace one object, locate first divergence and identify source constants. Do not maintain a second handwritten physics prescription for documentation.
 
-External inference, random sampling, coordinate arithmetic and collection operations must remain explicit boundaries. A generic primitive may call a mature numerical library; that does not make the model or collection-processing dependencies disappear.
+Inference, random sampling, coordinate arithmetic and physics-dependent collection operations must execute through CorrectionLib nodes. Keep input extraction and array layout preparation in adapters. A node may call a mature numerical library; document that dependency and the model or collection-processing requirements explicitly.
 
 ## Sources
 
