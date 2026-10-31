@@ -1,6 +1,8 @@
 # Report and talk guide
 
-Use this guide when preparing or revising the migration's report, outline or deck. Write `report.md` and build the talk with the DeckCraft MCP unless the user narrows the deliverables. Both address ATLAS colleagues who may not know CorrectionLib or the calibration and optimization details.
+Use this guide when preparing or revising the migration's report, outline or deck. Write `report.md` and prepare the talk unless the user narrows the deliverables. Both address ATLAS colleagues who may not know CorrectionLib or the calibration and optimization details.
+
+For every talk produced with this workflow, read and apply the [scientific-talks skill](https://github.com/gordonwatts/scientific-talk-marketplace/blob/main/plugins/scientific-talks/skills/scientific-talks/SKILL.md) as the foundation for outlining, evidence, style, deck construction and revision. Use its Gordon speaker profiles for talks written for Gordon: content guidance when outlining and visual guidance when building or editing slides. Select the talk-type profile from the brief; do not assume every talk is a colloquium. If the skill is unavailable locally, read its linked source and relevant references. This guide supplements it with calibration-specific content and evidence requirements. Preserve explicit user choices, including an existing DeckCraft requirement; otherwise follow the scientific-talks authoring-tool defaults.
 
 Continue the selected outline and existing deck; preserve their general structure, filenames and speaker edits. Follow repository instructions for document locations and commits. Use the task log and accepted evidence; preparing documentation alone does not justify rerunning benchmarks.
 
