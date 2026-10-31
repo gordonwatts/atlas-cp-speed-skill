@@ -9,6 +9,8 @@ Use this skill to convert ATLAS physics calibrations and systematic uncertaintie
 
 CorrectionLib must be the runtime entry point for all calibration, systematic, selection and weight calculations in paths B and C. Implement these calculations using existing nodes or new nodes registered through the selected CorrectionLib extension mechanism. Custom C++ and numerical libraries may execute behind those nodes. Adapters may read inputs, arrange arrays and translate outputs/statuses; they must not independently implement or orchestrate the physics prescription. Performance optimizations must preserve this boundary.
 
+Before starting a new campaign, read [efficient campaigns and reusable infrastructure](references/efficient-campaigns.md). Inventory reusable tooling and freeze the acceptance/output contract before launching expensive work; reuse infrastructure, never another calibration's numerical authority.
+
 Follow these steps:
 
 1. Measure current performance in AnalysisBase (AB) measure the I/O time and the time to run full calibration, and calibration and full systematics. The results of this provide the baseline timing and reference values for all subsequent steps.
@@ -26,7 +28,7 @@ Follow these steps:
    - Derive the same timing values as for the Path A for B and C.
 1. Optimize the columnar implementation
    - The outputs must remain the same (random number generators can violate this rule).
-   - The goal is the best possible performance for the columnar implementation. Aim for x10 speedup at least, but keep going if there are any optimizations you can see further.
+   - The goal is the best possible performance for the columnar implementation. Aim for x10 speedup at least, but treat it as an aspiration, not permission for an unbounded search. Prioritize measured costs; after one inconclusive paired study, reject that candidate unless new evidence changes the hypothesis. Stop when no concrete, profile-supported opportunity remains within scope, and report the achieved gain and deferred work.
    - There are two features in CorrectionLib that can really help here - the ability to return multiple results from a single node, and the ability to process arrays. Make as many other optimizations first before you make these ones. This is because these features are not part of the released correctionlib, and understanding how big a difference they make is important.
    - While you started by keeping tool boundaries as they were in the AB implementation, during optimization you do not have to keep those boundaries. You can combine nodes, or split them up, as long as the outputs remain the same.
 1. Build and test and time a standalone package that can be used outside of the ATLAS software environment.
