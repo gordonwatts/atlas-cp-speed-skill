@@ -5,7 +5,7 @@ Read this for ATLAS conversions. These are source-inspection prompts and numeric
 ## Three execution paths and common input
 
 - **A — release AnalysisBase:** use AnalysisBase straight out of the release, without modified tool implementations or replacement libraries. Configure the requested calculations normally; unmodified does not mean disabling calibration. This is the numerical authority.
-- **B — modified AnalysisBase:** integrate the conversion and accepted optimizations through the original framework interfaces, using the same shared correction calculation code and CorrectionLib payloads as C. Retained C++ physics belongs in that shared backend rather than a second framework-specific implementation.
+- **B — modified AnalysisBase:** integrate the conversion and accepted optimizations through the original framework interfaces, using the same shared correction calculation code and CorrectionLib payloads as C. C++ physics must execute behind the same registered CorrectionLib nodes used by C; framework adapters provide input/output plumbing.
 - **C — columnar:** read original PHYSLITE columns independently and call the shared backend used by B, preserving event boundaries, identities and source precision.
 
 All three paths must read the same selected original PHYSLITE file for testing, with matched event ranges and resolved correction/systematic configuration. Continue using the file already selected in the project's configuration; resolve and record its full identity rather than changing it during this skill cleanup. For discovery in this project, the existing selection was resolved through TestFileLiteR3MC.txt for Run-3 FullSim ttbar dataset 601229, PHYSLITE p7266; this is an input locator, not a numerical acceptance result or a requirement for every future calibration.
@@ -43,7 +43,7 @@ Diagnose dependency and SSL failures in the actual environment. Use verified dow
 
 Follow real imports and bindings before describing an implementation. Array input, GIL release, scalar C++ loops, threading and SIMD are separate properties. Check empty collections, absent vertices and empty systematic batches before native evaluation.
 
-Trace inference separately from efficiency/scale-factor lookups. Standard node availability depends on the selected CorrectionLib version. Unsupported operations remain outside CorrectionLib in this workflow; possible future nodes belong in the report and task log.
+Trace inference separately from efficiency/scale-factor lookups and show which CorrectionLib node invokes each calculation. Standard node availability depends on the selected CorrectionLib version. Implement missing operations as registered nodes using the selected extension mechanism; record their contracts, dependencies and validation in the report and task log. Numerical libraries may be dependencies of nodes, but adapters must not call them independently to perform physics.
 
 NOSYS may still run nominal calibration, selection and weights. A stored-object or no-calibration control must explicitly disable the relevant work and identify its output scope.
 
