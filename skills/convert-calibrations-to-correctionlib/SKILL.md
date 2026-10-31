@@ -1,11 +1,11 @@
 ---
 name: convert-calibrations-to-correctionlib
-description: Convert ATLAS physics calibrations and systematic uncertainties into composable CorrectionLib payloads, with reusable numerical primitives, framework and columnar adapters, validation against the original implementation, and an evidence-linked technical talk. Use for a substantive migration of correction prescriptions, not merely applying or presenting an existing payload.
+description: Convert ATLAS physics calibrations and systematic uncertainties into composable CorrectionLib payloads, with reusable numerical primitives, framework and columnar adapters, validation against the original implementation, and evidence-linked reports and talks. Use for a substantive migration of correction prescriptions, not merely applying or presenting an existing payload.
 ---
 
 # Convert calibrations to CorrectionLib
 
-Use this skill to convert ATLAS physics calibrations and systematic uncertainties into composable CorrectionLib payloads, with reusable numerical primitives, framework and columnar adapters. Once the conversion is complete, validate against the original implementation. Then use this skill to optimize the columnar implementation, measure performance, and prepare an evidence-linked technical talk.
+Use this skill to convert ATLAS physics calibrations and systematic uncertainties into composable CorrectionLib payloads, with reusable numerical primitives, framework and columnar adapters. Once the conversion is complete, validate against the original implementation. Then optimize the columnar implementation and measure performance.
 
 CorrectionLib must be the runtime entry point for all calibration, systematic, selection and weight calculations in paths B and C. Implement these calculations using existing nodes or new nodes registered through the selected CorrectionLib extension mechanism. Custom C++ and numerical libraries may execute behind those nodes. Adapters may read inputs, arrange arrays and translate outputs/statuses; they must not independently implement or orchestrate the physics prescription. Performance optimizations must preserve this boundary.
 
@@ -32,22 +32,19 @@ Follow these steps:
 1. Build and test and time a standalone package that can be used outside of the ATLAS software environment.
    - The main script that opens the PHYSLITE file and implements the calibration should be a PEP 723 script which installs a wheel that contains all the correction code and config payloads. It should read in a file given as an argument with uproot, call CorrectionLib to run calibration and full systematics, and then fill a `hist` (form the `hist` package), with one axis a category which is for each systematic, and the other axis is the calibrated value. The histogram should be written out to a file.
    - Measure timings for this one step.
-1. Write a report and a talk.
-   - Use the `deckcraft` MCP to write the talk. The report should be written as `report.md`
-   - Both need to be written for an audience that knows about ATLAS, but does not know much about CorrectionLib or how it works. And may not know all the tricks that are pulled to optimize the code.
-   - Write a slide for each major optimization that was done, and place a slide for the minor optimizations in the end of the talk in backup.
+1. Prepare the report and talk using the [report and talk guide](references/report-and-talk-guide.md), unless the user has narrowed the deliverables.
 
 ## Working Environment
 
 Use the `wsl2` distro called `atlas_al9` to run all three paths. You can use `setupATLAS` and then setup the most recent AnalysisBase release to run the original implementation. You will have to build the `develop` branch of CorrectionLib to run the reimplementation and columnar implementation. Do all your work in a directory called `~/atlas-cp-speed/<xxx>`, where `<xxx>` is the name of the calibration you are working on. If asked to continue some work, make sure to re-use the same directory.
 
-You can use `git` to manage your work, but do not push anything to the ATLAS gitlab repository. This is especially important when you start to optimize the columnar implementation. For each change you make please make a new commit, and keep the commit message descriptive of what you changed. This will help you when you are writing your talk.
+You can use `git` to manage your work, but do not push anything to the ATLAS gitlab repository. This is especially important when you start to optimize the columnar implementation. For each change, make a new commit with a descriptive message.
 
-Keep a log for yourself called `log.txt` in the directory on `wsl2`. This log is primarily for you to keep track of what you have done, but it will also be useful when you are writing your talk. You can also use this log to keep track of any issues you run into, and how you solved them. Remember that you may be asked to continue work in a second prompt and not always have the full context - make sure to take this into account when writing the log. When writing the talk, be sure to read [the scientific talk writing guide](references/talk-writing.md).
+Keep a chronological task log at the repository-prescribed location. Continue an existing log; otherwise use `log.txt`. Record decisions, issues, attempted changes, validation outcomes and evidence links so work can continue without the original chat.
 
 You will discover various things that obviously need optimizing as you are reading the code. Just track them in your log until you can get back to them. You can also profile the code to best understand where extra time is being spent. You can use `cProfile` to profile the code, along with other tools that are available in the environment.
 
-Feel free to spawn sub-agents when needed - especially if it will help keep your work organized and your context free. And if it will speed things up because you can work in parallel. But make sure to keep your log up to date with what you are doing, and what the sub-agent is doing. You will be asked to write a talk at the end of this skill, and it will be much easier if you have a good log of what you did.
+Use sub-agents when useful for organization or parallel investigation; record their assignments and findings in the task log. This does not change the single-CPU runtime and benchmark policy.
 
 ## Start with the requested scope
 
@@ -67,7 +64,7 @@ Read [ATLAS lessons](references/atlas-lessons.md) for the required A/B/C executi
 
 Run the untouched tools on a small sample, freeze the working configuration and capture resolved defaults. Record original object order and identities before thinning or sorting. Export intermediate stages, final outputs, selections, weights and statuses wherever the original interface exposes them.
 
-Preserve the original implementation's behavior even when it appears to contain a bug. Add a clearly marked `BUG` entry to `<task> - log.txt` with the source version/location, triggering inputs, observed behavior, why it appears defective, and how the conversion preserves it. Distinguish suspected from confirmed defects and link supporting evidence from the report. Do not silently correct the behavior or change expected results/tolerances to accommodate a fix; an intentional correction requires an explicit user decision separate from the faithful conversion.
+Preserve the original implementation's behavior even when it appears to contain a bug. Add a clearly marked `BUG` entry to the task log with the source version/location, triggering inputs, observed behavior, why it appears defective, and how the conversion preserves it. Distinguish suspected from confirmed defects and retain supporting evidence. Do not silently correct the behavior or change expected results/tolerances to accommodate a fix; an intentional correction requires an explicit user decision separate from the faithful conversion.
 
 Trace the real loading chain: configuration properties, resolver search paths, merge precedence, defaults, referenced files and named objects. For every active stage, record inputs/units/types, calculation, constants, interpolation, boundaries, output and rounding. Inspect source; names such as "spline" are not evidence of the actual algorithm.
 
@@ -75,9 +72,7 @@ Separate nominal recalibration, systematic application and selection/weight eval
 
 Trace the active caller through bindings to the evaluator; distinguish table conversion from migration of the complete recipe. Coexisting prototypes and unused wrappers are not evidence of the executed path. Explain where physics instructions live and what must be rebuilt or regenerated when they change.
 
-Maintain a responsibility map: exported constants, existing CorrectionLib nodes, custom nodes and their C++ implementations, numerical libraries called by nodes, and framework/array plumbing. Trace calls separately from returned-data dependencies, including constructors and payload loading. Show how every physics stage is reached through CorrectionLib, including inference and RNG. Distinguish historical implementations with physics outside CorrectionLib from the required architecture for paths B and C. This map is part of the implementation explanation and final talk, not just a list of dependencies.
-
-In the implementation report, identify the specific formulas, physics choices and stage ordering implemented by custom nodes, alongside those expressed using existing nodes. Explain each choice, citing measured speed or an evidenced capability limitation where applicable; distinguish provisional choices from measured conclusions. C++ physics must execute behind CorrectionLib nodes, and must be reported accurately rather than hidden under the term “adapter.” Record node implementations, payload configuration and subsequent changes in `<task> - log.txt`.
+Maintain a responsibility map: exported constants, existing CorrectionLib nodes, custom nodes and their C++ implementations, numerical libraries called by nodes, and framework/array plumbing. Trace calls separately from returned-data dependencies, including constructors and payload loading. Show how every physics stage is reached through CorrectionLib, including inference and RNG. Distinguish historical implementations with physics outside CorrectionLib from the required architecture for paths B and C. Include the formulas, physics choices and stage ordering owned by each node or payload, with evidence for capability/performance decisions. Distinguish provisional choices from measured conclusions and record subsequent changes in the task log. C++ physics must execute behind CorrectionLib nodes rather than being hidden in an adapter.
 
 ## Design a declarative calculation
 
@@ -85,7 +80,7 @@ Read [graph design and interfaces](references/graph-design.md) when designing th
 
 Choose between existing CorrectionLib nodes and custom nodes using faithful numerical semantics and comparable runtime measurements, retaining reference validation for each candidate. Both paths B and C must execute the same node implementations and payload configuration. Keep calibration-specific constants and configuration in the payload; identify which formulas, systematic branches, stage ordering, validity rules and precision decisions are expressed there and which are implemented inside custom nodes. Use existing schema nodes where they represent the calculation faithfully. Author readable named expressions and lower them to the distribution format; do not make nested JSON or scratch-register manipulation the primary human interface.
 
-When existing nodes cannot represent a required calculation faithfully, implement and register a new node through the selected CorrectionLib extension mechanism. Inspect that mechanism in the pinned source version rather than assuming a released version supports it. Record the limitation, node contract, configuration, dependencies and build/loading requirements in the report and task log. Validate node behavior, payload loading and execution through CorrectionLib in both paths B and C. An unimplemented required node remains an incomplete conversion; a separate calculation backend is not a completed substitute.
+When existing nodes cannot represent a required calculation faithfully, implement and register a new node through the selected CorrectionLib extension mechanism. Inspect that mechanism in the pinned source version rather than assuming a released version supports it. Record the limitation, node contract, configuration, dependencies and build/loading requirements in the task log. Validate node behavior, payload loading and execution through CorrectionLib in both paths B and C. An unimplemented required node remains an incomplete conversion; a separate calculation backend is not a completed substitute.
 
 ## Compile and package numerical data
 
@@ -107,7 +102,7 @@ Keep runtime execution and performance measurements on a single CPU with one exe
 
 Validate source primitive behavior, boundary cases, stage outputs, full state coverage and the complete requested sample. Identify the first divergent stage and inputs. Do not relax tolerances after failures. If an authoritative output was not recorded, state that limitation rather than inferring exact agreement.
 
-A conversion remains experimental and must not be declared complete until all required numerical acceptance checks pass. Unresolved required failures, including boundary-case failures, cannot be overridden by faster execution or agreement on an ordinary sample. Keep failures and missing checks visible in the implementation report and `<task> - log.txt`. Missing reference information is a limitation, never a pass; if it prevents a required check, completion requires an explicit user decision accepting that limitation, recorded with the resulting narrower acceptance claim. Do not silently waive checks or treat an accepted limitation as evidence of agreement.
+A conversion remains experimental and must not be declared complete until all required numerical acceptance checks pass. Unresolved required failures, including boundary-case failures, cannot be overridden by faster execution or agreement on an ordinary sample. Keep failures and missing checks visible in the acceptance records and task log. Missing reference information is a limitation, never a pass; if it prevents a required check, completion requires an explicit user decision accepting that limitation, recorded with the resulting narrower acceptance claim. Do not silently waive checks or treat an accepted limitation as evidence of agreement.
 
 After correctness, measure initialization, input/preparation, evaluation and output separately where practical. Label diagnostic workflows that include reference comparisons or repeat calculations. For a nominal-versus-full-systematics claim, use a paired input-to-output harness with the same inputs, selection, output conventions and CPU policy; rerun both modes rather than dividing an older nominal number into a new full-run number. Keep independent validation outside the timer when measuring analysis runtime. Match other timing scopes or explain the differences. Honor the requested repetition/warm-up policy and retain every measurement.
 
@@ -121,6 +116,6 @@ Deliver the frozen configuration, reproducible build/run/conversion steps, paylo
 
 When the work reveals a possible evaluator defect or generally useful optimization, distinguish it from application-specific changes. Check the current upstream source and existing issues/PRs before recommending a report or patch. Prepare a minimal independent reproduction, affected revision, expected and observed behavior, boundary regression tests and relevant performance tradeoffs; distinguish measured results from hypotheses. A local vendor patch may already be upstream. Do not submit externally without authorization.
 
-Follow the repository's artifact and local-commit rules. For an authorized source publication, read the publication guidance in [talk writing](references/talk-writing.md): preserve implementation history so performance claims can link to their actual commits, and distinguish source distribution size from runtime payload size. Do not push or submit upstream changes unless requested. This skill does not require delegation or grant authorization for external actions.
+Follow the repository's artifact and local-commit rules. Preserve implementation history and evidence needed to reproduce the results. Do not push or submit upstream changes unless requested; this skill grants no authorization for external actions.
 
 When extending this skill from another chat, read [contribution guidance](references/contributing.md). Add verified lessons to the relevant reference rather than appending a transcript or turning a sample-specific workaround into a universal rule.

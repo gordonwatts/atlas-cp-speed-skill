@@ -25,18 +25,11 @@ Useful scenario checks during final review:
 - Named pipelines call a shared nominal graph for every variation. Does the agent distinguish reuse of the definition from reuse of computed nominal values?
 - A file contains a NumPy prototype and a custom C++ wrapper. Does the agent follow actual imports and bindings before explaining which implementation runs?
 - Missing-primary-object handling exists in a graph, but extraction indexes an empty associated collection first. Does validation include the adapter boundary?
-- A talk follows the migration. Does it begin with the original reference and actual question, use the latest accepted evidence, distinguish numerical parity from visual overlays, label unmatched timing scopes, and keep draft visuals provisional?
 - A user asks for a transferable local-wheel demo. Does the script read the intended original file directly, include the complete requested states, keep reference fixtures in separate acceptance checks, and disclose the platform, download needs, exact command and output schema?
 - A user asks whether inference was optimized out of CorrectionLib. Does the explanation distinguish the original architecture from later caching/buffer changes, and inference from efficiency-table lookup?
 - A candidate uniform encoding changes only unused tables and the new job happens to run faster than last week's number. Does the agent report active-node coverage and use a fresh unchanged control rather than claim a lookup speedup?
 - A caller changes model, order or chunking, or mutates cached arrays. Do cache rules preserve dependencies and ownership, and do no-allocation tests verify the optimized path rather than a staging-header fallback?
-- A user requests an outline now and a deck in another chat. Does the handoff contain validated source links, working versus illustrative code, major-change slides and smaller-change backups, without silently creating the deck or overwriting newer speaker edits?
 
 Run expensive full physics validation only when required by the task or changed implementation. Skill wording edits alone do not justify rerunning the entire demo.
 
-For deck-building updates, also check these scenarios:
-
-- The speaker asks how inference is called by CorrectionLib. Does the explanation trace the public entry point through the registered node to its numerical-library dependency, distinguishing historical external inference from the required B/C architecture?
-- A histogram slide contains diagnostic recording and validation helpers. Does the revision show loading and a clear fill loop, label its adaptation and omissions, and distinguish kinematic from weight-only systematics?
-- The speaker manually edited the deck after the outline was written. Does the revision preserve those edits, use native hanging lists and equations, and disclose a renderer that cannot verify the equations?
-- A talk needs commit links but only source publication was authorized. Does the workflow preserve implementation history, exclude presentation assets, distinguish local from public references, and avoid claiming a standalone repository is a fork?
+For report, outline or deck changes, use the [report and talk guide](report-and-talk-guide.md) and review its requirements rather than duplicating writing instructions here.

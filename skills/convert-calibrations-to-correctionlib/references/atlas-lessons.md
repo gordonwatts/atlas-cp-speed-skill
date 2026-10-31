@@ -1,6 +1,6 @@
 # ATLAS calibration implementation lessons
 
-Read this for ATLAS conversions. These are source-inspection prompts and numerical hazards, not universal prescriptions: verify the active release, calibration recommendation and settings before applying any example. Keep task-specific configurations, measurements and implementation history in project reports. Follow repository instructions for authoritative source, builds, reports and artifact locations.
+Read this for ATLAS conversions. These are source-inspection prompts and numerical hazards, not universal prescriptions: verify the active release, calibration recommendation and settings before applying any example. Keep task-specific configurations, measurements and implementation history in project documentation. Follow repository instructions for authoritative source, builds, reports and artifact locations.
 
 ## Three execution paths and common input
 
@@ -43,7 +43,7 @@ Diagnose dependency and SSL failures in the actual environment. Use verified dow
 
 Follow real imports and bindings before describing an implementation. Array input, GIL release, scalar C++ loops, threading and SIMD are separate properties. Check empty collections, absent vertices and empty systematic batches before native evaluation.
 
-Trace inference separately from efficiency/scale-factor lookups and show which CorrectionLib node invokes each calculation. Standard node availability depends on the selected CorrectionLib version. Implement missing operations as registered nodes using the selected extension mechanism; record their contracts, dependencies and validation in the report and task log. Numerical libraries may be dependencies of nodes, but adapters must not call them independently to perform physics.
+Trace inference separately from efficiency/scale-factor lookups and show which CorrectionLib node invokes each calculation. Standard node availability depends on the selected CorrectionLib version. Implement missing operations as registered nodes using the selected extension mechanism; record their contracts, dependencies and validation in the task log. Numerical libraries may be dependencies of nodes, but adapters must not call them independently to perform physics.
 
 NOSYS may still run nominal calibration, selection and weights. A stored-object or no-calibration control must explicitly disable the relevant work and identify its output scope.
 
