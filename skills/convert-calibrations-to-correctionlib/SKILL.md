@@ -5,9 +5,47 @@ description: Convert ATLAS physics calibrations and systematic uncertainties int
 
 # Convert calibrations to CorrectionLib
 
-Preserve the original implementation as the numerical authority. Produce a reproducible converter, traceable payloads, shared calculation code, thin adapters and evidence of agreement. Table migrations and hybrid payload-plus-C++ implementations are acceptable completed conversions; choose where calculations live using measured runtime performance while preserving numerical correctness. A complete declarative rewrite is required only when explicitly requested; in that case the correction definition must own the physics prescription, and a table-lookup substitution alone is insufficient.
+Use this skill to convert ATLAS physics calibrations and systematic uncertainties into composable CorrectionLib payloads, with reusable numerical primitives, framework and columnar adapters. Once the conversion is complete, validate against the original implementation. Then use this skill to optimize the columnar implementation, measure performance, and prepare an evidence-linked technical talk.
 
-This skill supports ATLAS calibration migrations, including work from scratch. It is not a universal converter or a claim that every ATLAS calibration family has been tested. Distinguish established behavior, hypotheses and newly verified results. Keep campaign-specific configurations and results in project reports.
+Follow these steps:
+
+1. Measure current performance in AnalysisBase (AB) measure the I/O time and the time to run full calibration, and calibration and full systematics. The results of this provide the baseline timing and reference values for all subsequent steps.
+   - Build AB configuration files to run and time the requested calibration. Produce a histogram of the calibrated values (whatever the calibration affects).
+   - Build an AB configuration that just reads and times the PHYSLITE values that are used as input to the calibration. This will measure pure I/O time.
+   - Build an AB configuration that just runs and times the calibration and fills a histogram with the calibrated values.
+   - Build an AB configuraiton that runs calibration and full systematics and writes out each value (nominal and calibrated). These are the reference values for testing later modifications.
+   - This is called Path A - the original implementation.
+1. Convert the calibration and systematic uncertainties into CorrectionLib payloads, with reusable numerical primitives, framework and columnar adapters.
+   - Use the [`develop` branch of correctionlib](https://github.com/gordonwatts/correctionlib/tree/develop). You will have to build this - there are no builds of this in pypi.
+   - AB is arranged around tools to perform various functions. Initial conversion should match the tool boundaries. Create a node in CorrectionLib for each tool and copy over the configuration required into the correction lib config.
+   - Use the C++ calling conventions to replace the original AB implementation - _but_ the configuration of AB must remain the same. In short, it should be backwards compatible.
+   - Build a columnar implementation that uses the CorrectionLib payloads and new nodes to accomplish the same tasks as the original AB implementation. This should be based on `uproot` to read in the PHYSLITE file.
+   - The reimplementation in AB is called Path B. The columnar implementation in python is called Path C.
+   - Derive the same timing values as for the Path A for B and C.
+1. Optimize the columnar implementation
+   - The outputs must remain the same (random number generators can violate this rule).
+   - The goal is the best possible performance for the columnar implementation. Aim for x10 speedup at least, but keep going if there are any optimizations you can see further.
+   - There are two features in CorrectionLib that can really help here - the ability to return multiple results from a single node, and the ability to process arrays. Make as many other optimizations first before you make these ones. This is because these features are not part of the released correctionlib, and understanding how big a difference they make is important.
+   - While you started by keeping tool boundaries as they were in the AB implementation, during optimization you do not have to keep those boundaries. You can combine nodes, or split them up, as long as the outputs remain the same.
+1. Build and test and time a standalone package that can be used outside of the ATLAS software environment.
+   - The main script that opens the PHYSLITE file and implements the calibration should be a PEP 723 script which installs a wheel that contains all the correction code and config payloads. It should read in a file given as an argument with uproot, call CorrectionLib to run calibration and full systematics, and then fill a `hist` (form the `hist` package), with one axis a category which is for each systematic, and the other axis is the calibrated value. The histogram should be written out to a file.
+   - Measure timings for this one step.
+1. Write a report and a talk.
+   - Use the `deckcraft` MCP to write the talk. The report should be written as `report.md`
+   - Both need to be written for an audience that knows about ATLAS, but does not know much about CorrectionLib or how it works. And may not know all the tricks that are pulled to optimize the code.
+   - Write a slide for each major optimization that was done, and place a slide for the minor optimizations in the end of the talk in backup.
+
+## Working Environment
+
+Use the `wsl2` distro called `atlas_al9` to run all three paths. You can use `setupATLAS` and then setup the most recent AnalysisBase release to run the original implementation. You will have to build the `develop` branch of CorrectionLib to run the reimplementation and columnar implementation. Do all your work in a directory called `~/atlas-cp-speed/<xxx>`, where `<xxx>` is the name of the calibration you are working on. If asked to continue some work, make sure to re-use the same directory.
+
+You can use `git` to manage your work, but do not push anything to the ATLAS gitlab repository. This is especially important when you start to optimize the columnar implementation. For each change you make please make a new commit, and keep the commit message descriptive of what you changed. This will help you when you are writing your talk.
+
+Keep a log for yourself called `log.txt` in the directory on `wsl2`. This log is primarily for you to keep track of what you have done, but it will also be useful when you are writing your talk. You can also use this log to keep track of any issues you run into, and how you solved them. Remember that you may be asked to continue work in a second prompt and not always have the full context - make sure to take this into account when writing the log. When writing the talk, be sure to read [the scientific talk writing guide](references/talk-writing.md).
+
+You will discover various things that obviously need optimizing as you are reading the code. Just track them in your log until you can get back to them. You can also profile the code to best understand where extra time is being spent. You can use `cProfile` to profile the code, along with other tools that are available in the environment.
+
+Feel free to spawn sub-agents when needed - especially if it will help keep your work organized and your context free. And if it will speed things up because you can work in parallel. But make sure to keep your log up to date with what you are doing, and what the sub-agent is doing. You will be asked to write a talk at the end of this skill, and it will be much easier if you have a good log of what you did.
 
 ## Start with the requested scope
 
@@ -43,15 +81,9 @@ In the implementation report, identify the specific formulas, physics choices an
 
 Read [graph design and interfaces](references/graph-design.md) when designing the payload/compiler or reviewing evaluator capabilities.
 
-Choose the division between CorrectionLib tables/formulas and shared C++ physics using comparable runtime measurements, retaining reference validation for each candidate. More physics in the payload is not inherently a better result. For portions represented declaratively, put their component formulas, systematic branches, stage ordering, validity rules and precision decisions in the correction definition stored in the payload. Use existing schema nodes where they represent the calculation faithfully. Author readable named expressions and lower them to the distribution format; do not make nested JSON or scratch-register manipulation the primary human interface.
+Choose the division between CorrectionLib tables/formulas and custom nodes for correction lib in C++ physics using comparable runtime measurements, retaining reference validation for each candidate. More physics in the payload is not inherently a better result. For portions represented declaratively, put their component formulas, systematic branches, stage ordering, validity rules and precision decisions in the correction definition stored in the payload. Use existing schema nodes where they represent the calculation faithfully. Author readable named expressions and lower them to the distribution format; do not make nested JSON or scratch-register manipulation the primary human interface.
 
-For this version of the workflow, do not add new CorrectionLib nodes or modify its schema/parser/evaluator to introduce missing operations. Authoring helpers that expand into existing supported nodes are allowed. When an operation cannot be represented faithfully by the available nodes, implement that part outside CorrectionLib in the shared calculation layer. If a new node would be useful, record it as an unimplemented future opportunity in the report and `<task> - log.txt`: explain the calculation it would support, the current limitation and its proposed generic behavior. Distinguish correctness limitations from measured performance reasons for using external code; do not present a proposed node as an available capability.
-
-Whenever an unsupported CorrectionLib capability forces calculation outside standard CorrectionLib, add an explicit entry to the implementation report; the responsibility map alone is insufficient. Keep a chronological log in a text file named `<task> - log.txt`, replacing `<task>` with the task name, in the task's report/documentation location. Log each such limitation when encountered and append implementation decisions and validation outcomes as work proceeds; preserve earlier entries and link the log from the report. Record the affected stage and required semantics, the inspected CorrectionLib version and evidence for the limitation (for example, a missing node), why existing nodes or authoring helpers do not suffice, and the chosen implementation with its actual caller and physics ownership. Distinguish retained handwritten logic, a companion evaluator and a modification to CorrectionLib itself. Include added runtime dependencies/compatibility requirements, reference-validation evidence or outstanding checks, and the effect on the claimed declarative scope. Create the report entry when the limitation is encountered and update it after implementation and validation; an unresolved limitation must remain visible in the final report. A capability missing from the pinned version is not evidence that every CorrectionLib version lacks it.
-
-State accurately whether the implementation uses standard CorrectionLib, a versioned extension, interpreted graphs or generated code. A compiled C++ evaluator is not itself a per-payload JIT compiler.
-
-Choose execution granularity separately from authoring granularity. Small reusable definitions need not become small interpreted runtime calls; consider fusion or generated compiled code when measured execution costs justify it. Preserve a traceable executable prescription and numerical semantics across any lowering. A hybrid table-plus-C++ migration can be appropriate to the requested scope; identify the physics still owned by C++ rather than describing it as a complete declarative rewrite.
+Whenever an unsupported CorrectionLib capability forces calculation outside standard CorrectionLib, add a new node that integrates into CorrectionLib's plug-in system.
 
 ## Compile and package numerical data
 
@@ -60,16 +92,6 @@ Build conversion as a repeatable offline step using the original resolver/config
 Map every generated correction to its source setting/object and checksum. Record units, numerical types, flow behavior, validity and evaluator requirements. Reject unsupported active settings or required object types; unused source objects may be inventoried without conversion. Test completeness by resolving every active recipe dependency.
 
 Keep source calibration files as conversion inputs. Package everything required at runtime, including explicitly retained inference models. Verify runtime dependency claims with an isolated resolution environment; claim a file-open audit only if one was actually performed.
-
-## Integrate without duplicating physics
-
-Expose the same evaluator to framework and columnar callers. Framework adapters bind original interfaces/properties, extract inputs and translate results/statuses. Do not load competing implementations of the same component in one process.
-
-Columnar execution must read original inputs independently. Reconstruct event offsets, per-vertex indexing, original object order and matching features. Reference outputs are comparison targets, never physics inputs. An intermediate cache is acceptable only if produced from original inputs by the tested path, with identity/provenance checks.
-
-Document remaining collection operations and external numerical primitives. Preserve random seeds/streams, rounding, coordinate conventions and event reductions. Use nominal as the starting point for each independent systematic, unless the source explicitly specifies otherwise.
-
-Preserve established paths and benchmarks. Put a materially different implementation or validation campaign in a new directory. Rebuild only the environments intended to change.
 
 ## Demonstrate use outside the source environment
 
@@ -94,8 +116,6 @@ For an optimization campaign, keep one cumulative timing table from the initial 
 ## Deliver and preserve
 
 Deliver the frozen configuration, reproducible build/run/conversion steps, payload and provenance, evaluator/adapters, source-to-correction map, machine-readable comparisons and a short implementation explanation. Include supported configurations, actual validation coverage, remaining boundaries and benchmark scope.
-
-At the end of a substantive migration, prepare an evidence-linked technical talk about the work unless the user has explicitly narrowed the deliverables. Read [talk writing](references/talk-writing.md) when outlining or building it. Ground the narrative in the original-tool baseline, the actual executed architecture, a readable real-code use case, numerical validation, measured performance, portability demonstration when performed, limitations and the next question. Draft the talk's argument and evidence map before committing to visual design; keep candidate visuals provisional until the narrative is settled. Continue any existing user-selected outline rather than starting a competing one; follow repository instructions for document locations. A talk does not justify rerunning benchmarks on its own.
 
 When the work reveals a possible evaluator defect or generally useful optimization, distinguish it from application-specific changes. Check the current upstream source and existing issues/PRs before recommending a report or patch. Prepare a minimal independent reproduction, affected revision, expected and observed behavior, boundary regression tests and relevant performance tradeoffs; distinguish measured results from hypotheses. A local vendor patch may already be upstream. Do not submit externally without authorization.
 

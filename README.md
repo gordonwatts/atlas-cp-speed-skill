@@ -14,6 +14,9 @@ All three test from the same selected original PHYSLITE file, with B and C indep
 
 ## Current implementation policy
 
-Table and hybrid conversions are acceptable, guided by measured speed and numerical correctness. Use one CPU and one execution thread unless parallelization is explicitly requested. Do not add new CorrectionLib nodes; document missing capabilities and implement unsupported calculations outside the library. Preserve source bugs and mark them clearly in the task log. Standalone tests use CPython 3.14. Completion requires all required numerical acceptance checks to pass, with missing evidence explicitly accepted as a limitation.
-
-This repository contains the reusable skill, not calibration payloads, input data, implementation code or campaign results. Review individual instructions through GitHub issues and pull requests.
+- The outputs must remain the same. Small variations (due to different random number generators, for example, are acceptable).
+- CorrectionLib must be the top level interface, and everything must be under it. Creating new nodes is acceptable.
+- All testing occurs in a single CPU - do not run anything in parallel.
+- If you find source bugs, keep the behavior, but mark them in the log and eventual report.
+- Optimize for speed in the columnar version.
+- Once done optimizing, build a wheel that can be installed in a stand-alone environment (e.g. without `asetup` or similar) and can run the corrections.

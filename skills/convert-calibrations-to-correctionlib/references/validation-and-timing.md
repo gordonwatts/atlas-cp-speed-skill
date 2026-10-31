@@ -45,7 +45,6 @@ If comparing to measurements from an earlier campaign, label that fact. Differen
 
 For an input-to-output nominal/full comparison, hold the source file, branch list, chunking, feature preparation, selection, histogram axes/output format, CPU affinity and worker counts fixed between modes. Interleave modes to expose drift, preserve each run, and check that the nominal result is identical between them. Validate aggregate output against the independent original outside the measured interval when the desired timing excludes checks. Keep this separate from per-object numerical acceptance: matching histogram bins and selection counts cannot prove all jet values or weight sums match.
 
-
 ### Diagnose a declarative slowdown
 
 A migration can add graph dispatch, subgraph calls, scalar formula evaluations, Python/C++ conversion and allocation while retaining the same underlying table evaluator. More payload-defined physics and a slower total workflow do not establish that CorrectionLib lookup is the cause.

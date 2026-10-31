@@ -1,6 +1,6 @@
 # Turn a calibration migration into a technical talk
 
-Read this when the migration includes a talk, slide outline or deck. Continue the user-selected outline, inspect its linked project evidence, and preserve speaker edits. Follow repository instructions for document locations and local commits; keep campaign decisions in the outline and reports.
+Read this when the migration includes a talk, slide outline or deck. Continue the user-selected outline, inspect its linked project evidence, and preserve speaker edits. Follow repository instructions for document locations and local commits; keep campaign decisions in the outline and reports. The talk should be aimed at someone who knows about ATLAS software, but not CorrectionLib, and perhaps doesn't know all the details of the tools or the corrections being applied. They will not understand short hand for optimizations made.
 
 ## Build the argument from evidence
 
