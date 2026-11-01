@@ -19,6 +19,18 @@ Keep the report concise, linking detailed artifacts rather than reproducing them
 
 Keep numerical, architectural and performance evidence distinct. Use [validation and timing](validation-and-timing.md) for acceptance, hardware, benchmark and payload-size methods, and [portable demo packaging](portable-demo.md) for the standalone procedure.
 
+## Visual agreement for every calibrated variable
+
+Generate and deliver an original AnalysisBase A versus columnar C comparison for **every calibrated output variable in the requested scope**, not only one illustrative pT histogram. Inventory the variables first (including derived calibrated quantities exposed by the analysis); mark unchanged passthrough quantities and unavailable original observables explicitly. Do not silently substitute a different quantity or omit a variable because its reference was not captured.
+
+For each variable, plot the actual saved A and C results on identical bins with matched input/event range, object identity, selection and weights. Include a clearly labelled absolute residual C minus A beneath the overlay; if using a ratio, mask and disclose zero-denominator bins. Use physical units and readable legends, distinguish curves even when they coincide, and report entries, underflow/overflow and nonfinite handling. Do not normalize the two distributions independently to conceal yield differences.
+
+Provide nominal overlays for all variables and a systematic agreement summary covering every requested state for each variable (for example a variable-by-state maximum-residual plot). Include detailed overlays for discrepant states and representative kinematic variations; do not claim that a nominal plot demonstrates all-state agreement. For unchanged variables under weight-only variations, state that distinction explicitly. Discrete decisions/statuses need count or mismatch summaries rather than misleading continuous distributions.
+
+Retain generators, source artifact paths/hashes, accepted implementation identity, plotted values and machine-readable comparison results. Visually inspect the rendered figures, link the complete set from the report, and show at least one actual comparison directly in the delivery response. A short talk may show representative plots while linking the full set in backup. Histogram agreement supplements per-object/boundary acceptance and cannot replace it.
+
+Reuse preserved numerical outputs where available; plotting alone does not justify another benchmark campaign. If an original or converted variable was not saved, record the gap and capture the missing comparison outside timing before claiming complete visual coverage.
+
 ## Talk structure
 
 Keep the existing talk's order and emphasis when revising it. For a new campaign, the established structure is a useful starting point:

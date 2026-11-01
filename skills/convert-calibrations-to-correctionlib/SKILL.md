@@ -115,6 +115,8 @@ For an optimization campaign, keep one cumulative timing table from the initial 
 
 ## Deliver and preserve
 
+Generate original AnalysisBase versus columnar overlays and residuals for every calibrated variable, with all-state agreement summaries, as specified in the [report and talk guide](references/report-and-talk-guide.md#visual-agreement-for-every-calibrated-variable). Deliver the figures, not only textual claims of agreement.
+
 Deliver the frozen configuration, reproducible build/run/conversion steps, payload and provenance, evaluator/adapters, source-to-correction map, machine-readable comparisons and a short implementation explanation. Include supported configurations, actual validation coverage, remaining boundaries and benchmark scope.
 
 When the work reveals a possible evaluator defect or generally useful optimization, distinguish it from application-specific changes. Check the current upstream source and existing issues/PRs before recommending a report or patch. Prepare a minimal independent reproduction, affected revision, expected and observed behavior, boundary regression tests and relevant performance tradeoffs; distinguish measured results from hypotheses. A local vendor patch may already be upstream. Do not submit externally without authorization.
