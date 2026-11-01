@@ -33,6 +33,7 @@ Follow these steps:
    - While you started by keeping tool boundaries as they were in the AB implementation, during optimization you do not have to keep those boundaries. You can combine nodes, or split them up, as long as the outputs remain the same.
 1. Build and test and time a standalone package that can be used outside of the ATLAS software environment.
    - The main script that opens the PHYSLITE file and implements the calibration should be a PEP 723 script which installs a wheel that contains all the correction code and config payloads. It should read in a file given as an argument with uproot, call CorrectionLib to run calibration and full systematics, and then fill a `hist` (form the `hist` package), with one axis a category which is for each systematic, and the other axis is the calibrated value. The histogram should be written out to a file.
+   - Keep the analysis visible in that script: declare its dependencies for `uv run script.py`, explicitly import uproot and iterate selected branches in chunks, explicitly import/load CorrectionLib and its payload/provider, and show the correction call on each chunk. A packaged analysis CLI or object-specific facade alone does not satisfy this requirement. Only documented raw-data packing/binding helpers may be delegated; see [portable demo packaging](references/portable-demo.md).
    - Measure timings for this one step.
 1. Prepare the report and talk using the [report and talk guide](references/report-and-talk-guide.md), unless the user has narrowed the deliverables.
 
