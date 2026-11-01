@@ -46,7 +46,7 @@ You can use `git` to manage your work, but do not push anything to the ATLAS git
 
 Keep a chronological task log at the repository-prescribed location. Continue an existing log; otherwise use `log.txt`. Record decisions, issues, attempted changes, validation outcomes and evidence links so work can continue without the original chat.
 
-You will discover various things that obviously need optimizing as you are reading the code. Just track them in your log until you can get back to them. You can also profile the code to best understand where extra time is being spent. You can use `cProfile` to profile the code, along with other tools that are available in the environment.
+Maintain a living optimization-idea register from source inspection through final reporting. Inspect the repository's top-level directories and other calibration reports, implementation notes, timing records and rejected experiments for transferable ideas (for example jets to muons). Record provenance, why each mechanism might help this calculation, constraints, attempted tests and outcomes; never transfer another calibration's numerical authority or assume its gain carries over. Prioritize and try promising, in-scope, constraint-compatible ideas one at a time under the bounded validation/timing policy. See [collect and transfer optimization ideas](references/efficient-campaigns.md#collect-and-transfer-optimization-ideas).
 
 Use sub-agents when useful for organization or parallel investigation; record their assignments and findings in the task log. This does not change the single-CPU runtime and benchmark policy.
 
@@ -129,6 +129,8 @@ Report the ROOT input read footprint: the number of distinct leaves loaded for t
 Include a profiling study of the final accepted workflow in the implementation report: a measured phase breakdown and native hotspot analysis explaining where time is spent, with scope, overhead and unresolved costs explicit. See the [required profiling study](references/report-and-talk-guide.md#required-profiling-study-in-the-report).
 
 Generate original AnalysisBase versus columnar overlays and residuals for every calibrated variable, with all-state agreement summaries, as specified in the [report and talk guide](references/report-and-talk-guide.md#visual-agreement-for-every-calibrated-variable). Deliver the figures, not only textual claims of agreement.
+
+End the report with a formal table of 20 ranked, distinct remaining optimization ideas. Include ambitious but grounded suggestions as well as straightforward ones. Separate ideas compatible with current constraints, ideas requiring a stated rule change, and major architectural experiments; explain why each might help, its evidence and the next discriminating test. Keep the full register and attempted outcomes linked. Do not list abandoning PHYSLITE or generic extra threading as recommendations; a concrete future comparison of internal versus top-level parallelism may be included when its potential advantage is explained. See [future optimization ideas at the end of the report](references/report-and-talk-guide.md#future-optimization-ideas-at-the-end-of-the-report).
 
 Deliver the frozen configuration, reproducible build/run/conversion steps, payload and provenance, evaluator/adapters, source-to-correction map, machine-readable comparisons and a short implementation explanation. Include supported configurations, actual validation coverage, remaining boundaries and benchmark scope.
 
