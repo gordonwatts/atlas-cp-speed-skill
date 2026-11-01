@@ -6,6 +6,18 @@ For every talk produced with this workflow, read and apply the [scientific-talks
 
 Continue the selected outline and existing deck; preserve their general structure, filenames and speaker edits. Follow repository instructions for document locations and commits. Use the task log and accepted evidence; preparing documentation alone does not justify rerunning benchmarks.
 
+## Write for a reader new to the work
+
+The report and talk must be understandable to an ATLAS colleague who has not participated in the investigation, read the chat, seen a previous draft or opened the task log. They are a coherent account of the scientific/technical work, not a sequence of status updates. Establish the question and motivation, explain the original workflow and proposed replacement, then connect implementation choices, validation, measurements and limitations into an argument the reader can assess.
+
+- Define A/B/C, unfamiliar terms, tool/node roles and measurement conventions before using them. Explain what each mechanism does and why it matters; commit IDs, local filenames and labels such as “restored baseline” cannot carry that explanation on their own.
+- Describe the final executed implementation and accepted scope directly. When revising a conclusion, rewrite the affected paragraph/section and reconcile related tables, captions and conclusions. Do not append “now updated,” “as requested,” “the previous answer,” or similar editing commentary that requires conversation history. Record editorial decisions, requested changes and progress in the task log instead.
+- Retain investigation history when it explains a technical conclusion: for an optimization or rejected trial, introduce the starting behavior, hypothesis, actual change, validation, matched result and consequence. Explain what was restored and why if that matters. This causal history and the complete timing ledger remain evidence; they must not be confused with a document revision diary.
+- State the interpretation of results, failure modes and accepted exclusions in the narrative itself. A link supplies supporting detail, not missing context. Use descriptive evidence labels that say what a source demonstrates; keep exhaustive commands, hashes and provenance in linked records or backup without making them prerequisites for understanding the main claim.
+- Apply the same standard to the talk's audience content, spoken explanation, notes and backup. Introduce the necessary context as the argument develops; do not assume listeners know internal checkpoint names or have read the report. A revision should leave one consistent explanation of the final result, not contradictory old and new slide claims.
+
+Before delivery, read the report and outline as if the conversation and task log were unavailable. For each section, check that a new reader can identify what is being discussed, why it was done, how the evidence supports the result, and what the result permits or limits. Rewrite unexplained references and update-style paragraphs; check definitions, cross-references and consistency across report, talk and figures. This is an editorial review, not a reason to rerun valid numerical work.
+
 ## Report
 
 Keep the report concise, linking detailed artifacts rather than reproducing them. Cover:
