@@ -33,6 +33,14 @@ Convenience facades may remain available as an additional user interface, but th
 
 Validate and time this exact visible script after extraction on the original input with all requested states. Earlier facade/CLI acceptance and timing do not automatically validate a rewritten input loop.
 
+## Repeat complete input passes for profiling
+
+Expose `-n N` (optionally also `--repeat N`) in the visible PEP 723 script, defaulting to one pass. Require a positive integer. Each pass must reopen the original ROOT input, repeat the same configured event range and selected-branch chunk reads, and execute the complete requested correction/state/histogram loop. Do not replace rereading with replay of prepared arrays, cached correction results or an evaluation-only loop. Bound memory by releasing per-pass arrays and contexts; retain immutable provider/payload setup outside the loop, but reset pass-local calculation state so results cannot leak between passes. Preserve original event/object identifiers and RNG semantics.
+
+Reinitialize histograms for every pass. By default, save a single-pass result from the final pass, rather than silently multiplying yields by N; record the pass count and total processed event/object visits separately from unique input counts. Retain per-pass counts and deterministic output checks where the reference domain permits them, with each pass agreeing with the accepted one-pass output. Document whether output writing is repeated or final-only and keep that choice visible in profiling/timing scope. Verify `-n 1` compatibility, two-pass rereading and agreement, and rejection of zero, negative and noninteger values when implementing this option.
+
+Use this mode for the [at-least-60-second final native profile](profiling.md#collect-at-least-60-seconds-for-the-final-native-profile). It is a repeated in-process diagnostic, not N independent process-startup measurements or a replacement for the ordinary benchmark repetition policy. Warm filesystem caches are permitted and must be stated; a file reopen does not imply physical disk/network reads.
+
 ## Verify and measure the demonstration
 
 Check the runnable bundle after extraction, including its file list and checksums. Exercise a small sample from real input against the frozen reference where possible, then run the complete intended input. Compare category coverage, histogram contents and weight/selection summaries, not only successful exit. Keep the acceptance claim separate from the demo's aggregate-output check.
