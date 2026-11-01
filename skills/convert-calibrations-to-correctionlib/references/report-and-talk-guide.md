@@ -33,6 +33,8 @@ Reuse preserved numerical outputs where available; plotting alone does not justi
 
 ## Talk structure
 
+The main talk must include at least one dedicated visual-agreement slide showing an actual AnalysisBase-versus-columnar overlay with its residual, before performance claims. Include plots for every calibrated variable and the all-state agreement summary in the main talk or explicit backup slides; a report link alone is insufficient. The outline must identify the slide IDs, variables, figure assets and evidence. Keep representative plots and their residuals together on the main slide; move only additional plots and detailed methods to backup.
+
 Keep the existing talk's order and emphasis when revising it. For a new campaign, the established structure is a useful starting point:
 
 1. Motivation, the architectural choice and investigation questions.
@@ -45,7 +47,7 @@ Keep the existing talk's order and emphasis when revising it. For a new campaign
 8. Standalone wheel/script demonstration from original input to saved output.
 9. Measured lessons, limitations and next steps.
 
-Give each major optimization its own slide; put smaller changes, the complete timing history, controls, residual plots and detailed methods in backup. Include no-gain results when they explain the conclusion. Keep one point per main slide, with supporting detail in notes or backup.
+Give each major optimization its own slide; put smaller changes, the complete timing history, controls, additional comparison plots and detailed methods in backup. Include no-gain results when they explain the conclusion. Keep one point per main slide, with supporting detail in notes or backup.
 
 ## Evidence and explanations
 
