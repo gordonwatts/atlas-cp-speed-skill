@@ -99,11 +99,13 @@ When portability or a standalone analysis is part of the requested scope, read [
 
 ## Validate and measure
 
-Before profiling, read [profiling tool selection and recipes](references/profiling.md). Start with coarse timings, use Python profiling for Python costs, check native sampling support before writing detailed instrumentation, and keep profiling overhead separate from benchmark results.
+Before profiling, read [profiling tool selection and recipes](references/profiling.md). Start with coarse timings, use Python profiling for Python costs, check native sampling support before writing detailed instrumentation, and keep profiling overhead separate from benchmark results. The standalone script must support `-n N` complete input rereads; use enough passes for at least 60 seconds of real processing in the final native profile, as defined in that reference.
 
 Read [validation and timing](references/validation-and-timing.md) before defining acceptance tests or presenting performance claims.
 
 Keep runtime execution and performance measurements on a single CPU with one execution thread unless the user explicitly requests parallelization. Do not introduce multiple processing workers or enable implicit numerical-library threading; configure thread/worker limits and CPU affinity as needed, and record the effective policy. Concentrate optimization on algorithms, data movement, allocation and avoiding repeated work, not parallel speedup. Historical multi-worker results are not permission to use multiple CPUs. Concurrency checks apply only to an explicitly requested parallel scope and do not change the single-CPU benchmark policy unless requested.
+
+The profiler's collection/control work may run on a separate CPU while the calibration remains one thread pinned to one CPU. Verify and report the two affinities separately; this permission does not authorize parallel calibration, input processing or numerical libraries. Uninstrumented performance measurements retain the single-CPU policy.
 
 Validate source primitive behavior, boundary cases, stage outputs, full state coverage and the complete requested sample. Identify the first divergent stage and inputs. Do not relax tolerances after failures. If an authoritative output was not recorded, state that limitation rather than inferring exact agreement.
 
@@ -113,9 +115,13 @@ After correctness, measure initialization, input/preparation, evaluation and out
 
 For an observed migration overhead, use the diagnostic procedure in that reference to separate fixed from sample-dependent cost, isolate replaced components and test specific causes. Keep kernel gains distinct from full-workflow gains; preserve physics validation when optimizing.
 
+Use “unmodified ATLAS release (Path A)” for untouched release tools. Use “earlier campaign” for previous measurements, explicitly identifying modified B/C implementations and optimizations; measurement age does not imply unmodified release code. Keep environment labels such as “release Python” distinct from implementation provenance. Apply these terms consistently to reports, tables and figure legends.
+
 For an optimization campaign, keep one cumulative timing table from the initial baseline, including controls, no-gain experiments, reversions and CPU-policy changes. Change one mechanism at a time, preserve each accepted implementation/validation step, and check affected framework integration as well as the columnar path. A user requesting only a final framework timing does not require rerunning its entire historical sequence. Use a fresh unchanged control when attributing a small gain across sessions.
 
 ## Deliver and preserve
+
+Report the ROOT input read footprint: the number of distinct leaves loaded for the configured calibration and full-systematics recipe, and the average loaded data in KB/event. Retain the leaf inventory and byte-count evidence, distinguish compressed input from decoded data, and identify extra transport or diagnostic inputs. See [required ROOT input footprint](references/report-and-talk-guide.md#required-root-input-footprint-in-the-report).
 
 Include a profiling study of the final accepted workflow in the implementation report: a measured phase breakdown and native hotspot analysis explaining where time is spent, with scope, overhead and unresolved costs explicit. See the [required profiling study](references/report-and-talk-guide.md#required-profiling-study-in-the-report).
 
