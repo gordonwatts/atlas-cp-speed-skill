@@ -19,6 +19,19 @@ Keep the report concise, linking detailed artifacts rather than reproducing them
 
 Keep numerical, architectural and performance evidence distinct. Use [validation and timing](validation-and-timing.md) for acceptance, hardware, benchmark and payload-size methods, and [portable demo packaging](portable-demo.md) for the standalone procedure.
 
+## Required profiling study in the report
+
+Include a profiling study answering **where most execution time is spent in the final accepted workflow**. Use [profiling tool selection](profiling.md): perf sampling when usable, otherwise explain the concrete limitation and use an appropriate alternative. Historical profiles can explain optimization decisions but must not be presented as the final implementation's cost distribution.
+
+Report both levels of evidence:
+
+- An uninstrumented workflow phase breakdown (startup/loading, input/preparation, correction evaluation, histogram/output and unassigned time) from the same retained campaign where available. Define timer boundaries, denominator and any overlap.
+- A native hotspot table or plot with readable function/stage names, self versus inclusive cost, event/sample basis and the workload profiled. Inspect call stacks to connect low-level symbols to analysis work. Preserve an explicit unknown/unassigned category rather than assigning every sample a speculative meaning.
+
+State the input, state set, source/binary identity, tool version, exact command, CPU policy, sample count, lost samples, symbol/unwind quality and measured instrumentation overhead where available. Link raw profiles or their retained location, reproducible report commands and machine-readable summaries. Record the output agreement check for the profiled run. Clearly separate sampled CPU percentages from elapsed-time fractions; never convert them into exact seconds or predicted speedups using a different run.
+
+Conclude with the dominant observed costs, actionable hypotheses and what the study cannot resolve. A short low-statistics profile can establish coarse hotspots, but do not claim precise rankings or a complete cost attribution from it. If phase data or symbol coverage is missing, disclose that gap. Reuse existing valid profiles and timing records where possible; do not rerun a benchmark just to redraw a table.
+
 ## Visual agreement for every calibrated variable
 
 Generate and deliver an original AnalysisBase A versus columnar C comparison for **every calibrated output variable in the requested scope**, not only one illustrative pT histogram. Inventory the variables first (including derived calibrated quantities exposed by the analysis); mark unchanged passthrough quantities and unavailable original observables explicitly. Do not silently substitute a different quantity or omit a variable because its reference was not captured.

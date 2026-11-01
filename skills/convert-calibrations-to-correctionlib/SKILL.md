@@ -117,6 +117,8 @@ For an optimization campaign, keep one cumulative timing table from the initial 
 
 ## Deliver and preserve
 
+Include a profiling study of the final accepted workflow in the implementation report: a measured phase breakdown and native hotspot analysis explaining where time is spent, with scope, overhead and unresolved costs explicit. See the [required profiling study](references/report-and-talk-guide.md#required-profiling-study-in-the-report).
+
 Generate original AnalysisBase versus columnar overlays and residuals for every calibrated variable, with all-state agreement summaries, as specified in the [report and talk guide](references/report-and-talk-guide.md#visual-agreement-for-every-calibrated-variable). Deliver the figures, not only textual claims of agreement.
 
 Deliver the frozen configuration, reproducible build/run/conversion steps, payload and provenance, evaluator/adapters, source-to-correction map, machine-readable comparisons and a short implementation explanation. Include supported configurations, actual validation coverage, remaining boundaries and benchmark scope.
