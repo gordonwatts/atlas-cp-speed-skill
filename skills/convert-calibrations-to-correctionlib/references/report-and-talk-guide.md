@@ -19,6 +19,8 @@ Keep the report concise, linking detailed artifacts rather than reproducing them
 
 Keep numerical, architectural and performance evidence distinct. Use [validation and timing](validation-and-timing.md) for acceptance, hardware, benchmark and payload-size methods, and [portable demo packaging](portable-demo.md) for the standalone procedure.
 
+Report B's matched performance against A explicitly. If B is slower, describe the dedicated investigation, validated changes and remaining adoption blocker; a faster C is not a substitute for framework non-regression. Show the checkpoint after straightforward optimizations with original tool boundaries, then any subsequent tool combination as its own architectural step, with separate numerical acceptance and timing attribution. See [framework non-regression and tool-boundary sequencing](validation-and-timing.md#protect-framework-path-b-from-regression).
+
 ## Required ROOT input footprint in the report
 
 Report how much original event data the configured calibration reads, alongside its I/O timing:
