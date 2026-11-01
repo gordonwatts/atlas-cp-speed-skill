@@ -99,6 +99,8 @@ When portability or a standalone analysis is part of the requested scope, read [
 
 ## Validate and measure
 
+Before profiling, read [profiling tool selection and recipes](references/profiling.md). Start with coarse timings, use Python profiling for Python costs, check native sampling support before writing detailed instrumentation, and keep profiling overhead separate from benchmark results.
+
 Read [validation and timing](references/validation-and-timing.md) before defining acceptance tests or presenting performance claims.
 
 Keep runtime execution and performance measurements on a single CPU with one execution thread unless the user explicitly requests parallelization. Do not introduce multiple processing workers or enable implicit numerical-library threading; configure thread/worker limits and CPU affinity as needed, and record the effective policy. Concentrate optimization on algorithms, data movement, allocation and avoiding repeated work, not parallel speedup. Historical multi-worker results are not permission to use multiple CPUs. Concurrency checks apply only to an explicitly requested parallel scope and do not change the single-CPU benchmark policy unless requested.
