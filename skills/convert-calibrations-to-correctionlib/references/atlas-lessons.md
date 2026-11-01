@@ -2,6 +2,8 @@
 
 Read this for ATLAS conversions. These are source-inspection prompts and numerical hazards, not universal prescriptions: verify the active release, calibration recommendation and settings before applying any example. Keep task-specific configurations, measurements and implementation history in project documentation. Follow repository instructions for authoritative source, builds, reports and artifact locations.
 
+Read [AnalysisBase setup and configuration discovery](analysisbase-discovery.md) before the first original run or when changing object/release. It gives the setup/run pattern and explains how to resolve full systematic coverage from installed configuration and initialized tools.
+
 ## Three execution paths and common input
 
 - **A — release AnalysisBase:** use AnalysisBase straight out of the release, without modified tool implementations or replacement libraries. Configure the requested calculations normally; unmodified does not mean disabling calibration. This is the numerical authority.

@@ -16,6 +16,31 @@ A PEP 723 script can declare `requires-python` and `dependencies` in its header.
 
 Choose the input users actually have, such as the original ROOT analysis file, and read it directly in bounded chunks. Avoid requiring a prepared NumPy/NPZ conversion merely to demonstrate the correction package. Validate required branches and preserve event/object identity and collection-dependent features. Run every requested nominal, kinematic and weight-only state. For a histogram example, use an explicit numeric axis and a category axis covering the states; state whether fills are weighted, what selections apply, and why weight-only variations may repeat nominal kinematic bins. Save axis names/edges, category labels, regular counts, flow counts and useful per-state summaries, then print the output path, processed events/objects, total entries and category list. Refuse to overwrite an existing result or put each run in a new directory.
 
+## Keep the analysis visible in the standalone script
+
+The delivered example must be a standalone PEP 723 script invoked at the top level as `uv run script.py INPUT OUTPUT`, with its Python requirement and dependencies declared in the script. Package the native provider, bindings and payload as needed, but do not make the example a thin wrapper around a packaged analysis CLI or an object-specific facade such as `MuonCorrections.iterate`.
+
+The script itself must visibly:
+
+1. Import `uproot`, specify the tree and requested branches, and iterate over input chunks using uproot. A branch list may come from a documented layout manifest, but the branch selection and read loop must be present in the script.
+2. Import `correctionlib`, locate the packaged configuration/payload, load any required native plugin using the pinned API, construct the CorrectionSet and select the named correction. Show these operations rather than hiding them behind a convenience object's `load()`.
+3. Map each chunk's arrays into the correction's inputs and explicitly call its `evaluate(...)` (or the verified native multiple-output API). Keep the systematic/output traversal visible. Explain units, types and event/object alignment.
+4. Fill and save the requested histograms from the returned arrays and print the saved-output summary.
+
+Some custom nodes require a native raw-input context instead of directly accepting every branch array. In that case a small, documented packing/binding helper is permitted: show its input arrays, context lifetime and the subsequent explicit CorrectionLib call in the script. The helper must not open the input file, hide chunk iteration, select physics states, run corrections or implement calibration/selection/weight arithmetic. Keep physics inside CorrectionLib nodes and keep data transport distinct from physics orchestration.
+
+Convenience facades may remain available as an additional user interface, but they do not replace this transparent demonstration. If the current binding prevents a direct call, document the exact limitation and implement or expose the minimal transport interface; do not silently substitute an opaque wrapper or claim the requirement is satisfied.
+
+Validate and time this exact visible script after extraction on the original input with all requested states. Earlier facade/CLI acceptance and timing do not automatically validate a rewritten input loop.
+
+## Repeat complete input passes for profiling
+
+Expose `-n N` (optionally also `--repeat N`) in the visible PEP 723 script, defaulting to one pass. Require a positive integer. Each pass must reopen the original ROOT input, repeat the same configured event range and selected-branch chunk reads, and execute the complete requested correction/state/histogram loop. Do not replace rereading with replay of prepared arrays, cached correction results or an evaluation-only loop. Bound memory by releasing per-pass arrays and contexts; retain immutable provider/payload setup outside the loop, but reset pass-local calculation state so results cannot leak between passes. Preserve original event/object identifiers and RNG semantics.
+
+Reinitialize histograms for every pass. By default, save a single-pass result from the final pass, rather than silently multiplying yields by N; record the pass count and total processed event/object visits separately from unique input counts. Retain per-pass counts and deterministic output checks where the reference domain permits them, with each pass agreeing with the accepted one-pass output. Document whether output writing is repeated or final-only and keep that choice visible in profiling/timing scope. Verify `-n 1` compatibility, two-pass rereading and agreement, and rejection of zero, negative and noninteger values when implementing this option.
+
+Use this mode for the [at-least-60-second final native profile](profiling.md#collect-at-least-60-seconds-for-the-final-native-profile). It is a repeated in-process diagnostic, not N independent process-startup measurements or a replacement for the ordinary benchmark repetition policy. Warm filesystem caches are permitted and must be stated; a file reopen does not imply physical disk/network reads.
+
 ## Verify and measure the demonstration
 
 Check the runnable bundle after extraction, including its file list and checksums. Exercise a small sample from real input against the frozen reference where possible, then run the complete intended input. Compare category coverage, histogram contents and weight/selection summaries, not only successful exit. Keep the acceptance claim separate from the demo's aggregate-output check.

@@ -9,6 +9,8 @@ Use this skill to convert ATLAS physics calibrations and systematic uncertaintie
 
 CorrectionLib must be the runtime entry point for all calibration, systematic, selection and weight calculations in paths B and C. Implement these calculations using existing nodes or new nodes registered through the selected CorrectionLib extension mechanism. Custom C++ and numerical libraries may execute behind those nodes. Adapters may read inputs, arrange arrays and translate outputs/statuses; they must not independently implement or orchestrate the physics prescription. Performance optimizations must preserve this boundary.
 
+Before starting a new campaign, read [efficient campaigns and reusable infrastructure](references/efficient-campaigns.md). Inventory reusable tooling and freeze the acceptance/output contract before launching expensive work; reuse infrastructure, never another calibration's numerical authority.
+
 Follow these steps:
 
 1. Measure current performance in AnalysisBase (AB) measure the I/O time and the time to run full calibration, and calibration and full systematics. The results of this provide the baseline timing and reference values for all subsequent steps.
@@ -24,13 +26,15 @@ Follow these steps:
    - Build a columnar implementation that uses the CorrectionLib payloads and new nodes to accomplish the same tasks as the original AB implementation. This should be based on `uproot` to read in the PHYSLITE file.
    - The reimplementation in AB is called Path B. The columnar implementation in python is called Path C.
    - Derive the same timing values as for the Path A for B and C.
+   - Protect traditional framework performance: if B is slower than A, prioritize a dedicated B investigation and validated optimization work, rather than accepting the regression because C is faster. Preserve unchanged analysis configuration and independent numerical agreement with A. Require matched timing evidence of no resolved slowdown before recommending B as a replacement; see [framework non-regression](references/validation-and-timing.md#protect-framework-path-b-from-regression).
 1. Optimize the columnar implementation
    - The outputs must remain the same (random number generators can violate this rule).
-   - The goal is the best possible performance for the columnar implementation. Aim for x10 speedup at least, but keep going if there are any optimizations you can see further.
+   - The goal is the best possible performance for the columnar implementation. Aim for x10 speedup at least, but treat it as an aspiration, not permission for an unbounded search. Prioritize measured costs; after one inconclusive paired study, reject that candidate unless new evidence changes the hypothesis. Stop when no concrete, profile-supported opportunity remains within scope, and report the achieved gain and deferred work.
    - There are two features in CorrectionLib that can really help here - the ability to return multiple results from a single node, and the ability to process arrays. Make as many other optimizations first before you make these ones. This is because these features are not part of the released correctionlib, and understanding how big a difference they make is important.
-   - While you started by keeping tool boundaries as they were in the AB implementation, during optimization you do not have to keep those boundaries. You can combine nodes, or split them up, as long as the outputs remain the same.
+   - Keep the original tool boundaries while exhausting straightforward, profile-supported optimizations that do not require combining tools. Only then may tools/nodes be combined or split, preserving outputs and the framework compatibility contract. Keep a validated and timed checkpoint before changing boundaries, and measure that architectural change separately from simpler optimizations and native multiple-output/array features; do not introduce them together as one optimization.
 1. Build and test and time a standalone package that can be used outside of the ATLAS software environment.
    - The main script that opens the PHYSLITE file and implements the calibration should be a PEP 723 script which installs a wheel that contains all the correction code and config payloads. It should read in a file given as an argument with uproot, call CorrectionLib to run calibration and full systematics, and then fill a `hist` (form the `hist` package), with one axis a category which is for each systematic, and the other axis is the calibrated value. The histogram should be written out to a file.
+   - Keep the analysis visible in that script: declare its dependencies for `uv run script.py`, explicitly import uproot and iterate selected branches in chunks, explicitly import/load CorrectionLib and its payload/provider, and show the correction call on each chunk. A packaged analysis CLI or object-specific facade alone does not satisfy this requirement. Only documented raw-data packing/binding helpers may be delegated; see [portable demo packaging](references/portable-demo.md).
    - Measure timings for this one step.
 1. Prepare the report and talk using the [report and talk guide](references/report-and-talk-guide.md), unless the user has narrowed the deliverables.
 
@@ -42,7 +46,7 @@ You can use `git` to manage your work, but do not push anything to the ATLAS git
 
 Keep a chronological task log at the repository-prescribed location. Continue an existing log; otherwise use `log.txt`. Record decisions, issues, attempted changes, validation outcomes and evidence links so work can continue without the original chat.
 
-You will discover various things that obviously need optimizing as you are reading the code. Just track them in your log until you can get back to them. You can also profile the code to best understand where extra time is being spent. You can use `cProfile` to profile the code, along with other tools that are available in the environment.
+Maintain a living optimization-idea register from source inspection through final reporting. Inspect the repository's top-level directories and other calibration reports, implementation notes, timing records and rejected experiments for transferable ideas (for example jets to muons). Record provenance, why each mechanism might help this calculation, constraints, attempted tests and outcomes; never transfer another calibration's numerical authority or assume its gain carries over. Prioritize and try promising, in-scope, constraint-compatible ideas one at a time under the bounded validation/timing policy. See [collect and transfer optimization ideas](references/efficient-campaigns.md#collect-and-transfer-optimization-ideas).
 
 Use sub-agents when useful for organization or parallel investigation; record their assignments and findings in the task log. This does not change the single-CPU runtime and benchmark policy.
 
@@ -96,9 +100,13 @@ When portability or a standalone analysis is part of the requested scope, read [
 
 ## Validate and measure
 
+Before profiling, read [profiling tool selection and recipes](references/profiling.md). Start with coarse timings, use Python profiling for Python costs, check native sampling support before writing detailed instrumentation, and keep profiling overhead separate from benchmark results. The standalone script must support `-n N` complete input rereads; use enough passes for at least 60 seconds of real processing in the final native profile, as defined in that reference.
+
 Read [validation and timing](references/validation-and-timing.md) before defining acceptance tests or presenting performance claims.
 
 Keep runtime execution and performance measurements on a single CPU with one execution thread unless the user explicitly requests parallelization. Do not introduce multiple processing workers or enable implicit numerical-library threading; configure thread/worker limits and CPU affinity as needed, and record the effective policy. Concentrate optimization on algorithms, data movement, allocation and avoiding repeated work, not parallel speedup. Historical multi-worker results are not permission to use multiple CPUs. Concurrency checks apply only to an explicitly requested parallel scope and do not change the single-CPU benchmark policy unless requested.
+
+The profiler's collection/control work may run on a separate CPU while the calibration remains one thread pinned to one CPU. Verify and report the two affinities separately; this permission does not authorize parallel calibration, input processing or numerical libraries. Uninstrumented performance measurements retain the single-CPU policy.
 
 Validate source primitive behavior, boundary cases, stage outputs, full state coverage and the complete requested sample. Identify the first divergent stage and inputs. Do not relax tolerances after failures. If an authoritative output was not recorded, state that limitation rather than inferring exact agreement.
 
@@ -108,9 +116,21 @@ After correctness, measure initialization, input/preparation, evaluation and out
 
 For an observed migration overhead, use the diagnostic procedure in that reference to separate fixed from sample-dependent cost, isolate replaced components and test specific causes. Keep kernel gains distinct from full-workflow gains; preserve physics validation when optimizing.
 
+Use “unmodified ATLAS release (Path A)” for untouched release tools. Use “earlier campaign” for previous measurements, explicitly identifying modified B/C implementations and optimizations; measurement age does not imply unmodified release code. Keep environment labels such as “release Python” distinct from implementation provenance. Apply these terms consistently to reports, tables and figure legends.
+
 For an optimization campaign, keep one cumulative timing table from the initial baseline, including controls, no-gain experiments, reversions and CPU-policy changes. Change one mechanism at a time, preserve each accepted implementation/validation step, and check affected framework integration as well as the columnar path. A user requesting only a final framework timing does not require rerunning its entire historical sequence. Use a fresh unchanged control when attributing a small gain across sessions.
 
 ## Deliver and preserve
+
+Write the report and talk as self-contained explanations for ATLAS colleagues who have not followed the work or this conversation. Explain the problem, final implementation, methods, results and limitations; define terms and A/B/C before relying on them. Revise the narrative when conclusions change rather than appending progress updates or unexplained references to earlier drafts. Keep editorial history in the task log. See [write for a reader new to the work](references/report-and-talk-guide.md#write-for-a-reader-new-to-the-work).
+
+Report the ROOT input read footprint: the number of distinct leaves loaded for the configured calibration and full-systematics recipe, and the average loaded data in KB/event. Retain the leaf inventory and byte-count evidence, distinguish compressed input from decoded data, and identify extra transport or diagnostic inputs. See [required ROOT input footprint](references/report-and-talk-guide.md#required-root-input-footprint-in-the-report).
+
+Include a profiling study of the final accepted workflow in the implementation report: a measured phase breakdown and native hotspot analysis explaining where time is spent, with scope, overhead and unresolved costs explicit. See the [required profiling study](references/report-and-talk-guide.md#required-profiling-study-in-the-report).
+
+Generate original AnalysisBase versus columnar overlays and residuals for every calibrated variable, with all-state agreement summaries, as specified in the [report and talk guide](references/report-and-talk-guide.md#visual-agreement-for-every-calibrated-variable). Deliver the figures, not only textual claims of agreement.
+
+End the report with a formal table of 20 ranked, distinct remaining optimization ideas. Include ambitious but grounded suggestions as well as straightforward ones. Separate ideas compatible with current constraints, ideas requiring a stated rule change, and major architectural experiments; explain why each might help, its evidence and the next discriminating test. Keep the full register and attempted outcomes linked. Do not list abandoning PHYSLITE or generic extra threading as recommendations; a concrete future comparison of internal versus top-level parallelism may be included when its potential advantage is explained. See [future optimization ideas at the end of the report](references/report-and-talk-guide.md#future-optimization-ideas-at-the-end-of-the-report).
 
 Deliver the frozen configuration, reproducible build/run/conversion steps, payload and provenance, evaluator/adapters, source-to-correction map, machine-readable comparisons and a short implementation explanation. Include supported configurations, actual validation coverage, remaining boundaries and benchmark scope.
 
