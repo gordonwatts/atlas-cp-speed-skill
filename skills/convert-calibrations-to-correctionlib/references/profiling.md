@@ -2,6 +2,10 @@
 
 Read before investigating a performance bottleneck. Choose the least intrusive tool that answers the question; profiles select experiments, while uninstrumented repeated workflows establish gains.
 
+## Terms to define in reports
+
+**Sampled CPU share** estimates the fraction of recorded CPU observations at a function or stack; it is not a wall-time fraction and does not include time blocked waiting for I/O. **Self (exclusive) cost** counts samples executing inside a function itself, excluding functions it calls. **Inclusive cost** also includes its callees; inclusive rows overlap and must not be added. Neither term says how many CPUs were used. Define these terms next to the first profiling table in the report, using plain labels such as “exclusive share of sampled CPU time.” Keep unresolved function names distinct from known functions that have not been assigned to input/evaluation/output stages.
+
 ## Tool selection
 
 | Question | Start with | Helps with | Does not establish |
@@ -59,6 +63,14 @@ Use optimized code with debug information and preserve matching binaries/build I
 For framework jobs, verify samples include the event-processing descendants, not only a launcher that waits. For standalone demos, distinguish launcher/startup profiling from profiling the actual Python analysis. Keep CPU affinity and numerical thread limits; do not use system-wide collection by default.
 
 In WSL/VMs, the guest distribution and host-provided kernel can differ, and hardware PMUs may be unavailable. An installed perf package alone proves neither event support nor kernel compatibility. Inspect package availability and use a compatible tool build when needed; do not silently change system permissions, kernel settings or the execution environment. If sampling is blocked, record the precise limitation and use targeted instrumentation rather than spending an unbounded session on profiler setup. See [perf record options](https://man7.org/linux/man-pages/man1/perf-record.1.html) and [kernel perf access controls](https://docs.kernel.org/admin-guide/perf-security.html).
+
+## Collect at least 60 seconds for the final native profile
+
+A short run is sufficient to check event support and symbols, but the final hotspot study must cover at least **60 seconds of actual repeated input processing**, excluding dependency installation, waiting/sleep and one-time launcher/setup work. Use the standalone script's `-n N` mode to reopen and process the original input repeatedly, with the full requested systematic set and unchanged per-pass work. Estimate N from measured processing time per pass, for example `ceil(60 / seconds_per_pass)` with a modest margin, then verify and record the observed processing duration. If it falls short, preserve that diagnostic and collect a new profile with a sufficient N; never pad with sleep or claim installation time as analysis coverage.
+
+Record N, unique input events/objects, total event/object visits, per-pass counts/agreement, pass timing boundaries, sample rate/count, lost samples and symbol/stack coverage. More samples reduce sampling noise; they do not fix missing symbols or establish exact stage ownership. Keep the sample rate modest initially, inspect losses/overhead, and retain matching uninstrumented measurements separately. Repeated passes amortize initialization and tend to warm filesystem caches: describe this as a sustained repeated-pass workload and do not silently replace the single-pass workflow profile or benchmark. State whether the native profile covers the whole process or only repeated processing and account for startup/final output accordingly.
+
+Keep calibration and input execution on one thread pinned to one CPU, including implicit library workers. Profiler collection/control work may use a separate CPU; set and verify collector and analysis affinities independently, ensuring descendants inherit the intended analysis affinity. Do not enable system-wide collection or a second analysis worker to obtain more samples. Record effective placement and any remaining profiling interference.
 
 ## Verified WSL software-sampling recipe
 
