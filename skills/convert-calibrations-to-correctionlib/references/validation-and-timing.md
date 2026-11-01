@@ -53,6 +53,20 @@ Use the measured phase breakdown to choose the next probe. Separate input/featur
 
 Treat allocation, dispatch and inference costs as hypotheses until measured. For changes intended to remove an overhead, compare against the preserved baseline with unchanged physics and acceptance criteria. Report improvements only for the measured scope. Do not conclude that performance inherently worsens with greater CorrectionLib use from one architectural comparison.
 
+### Protect framework Path B from regression
+
+Path B must preserve the traditional analysis configuration, numerical results and practical performance against the unmodified release Path A. A faster columnar Path C does not compensate for making the framework path slower. If matched measurements show B slower than A, give that regression additional investigation and optimization priority; numerical agreement alone is insufficient to recommend B as a replacement.
+
+First verify independent A/B output agreement and matched input, event range, state set, selection, intermediate/output work, CPU/thread limits, initialization and timing boundaries. Use fresh controls and paired or interleaved repetitions to distinguish a real slowdown from noise. Then apply the fixed/sample-dependent and component-isolation procedures below: profile the executed B path and investigate adapter access, dispatch, allocation, repeated loading/computation and output costs, rather than assuming CorrectionLib lookup is responsible. Validate and commit one change at a time, retesting affected shared C behavior too. Preserve framework interfaces; do not obtain parity by silently changing configuration, dropping work, reducing systematics or using more CPUs.
+
+Before recommending B for adoption, provide final matched nominal and full-systematics A/B timings with spread and no resolved regression in the requested workloads. This is a performance requirement separate from numerical acceptance; lack of statistical resolution is not proof of exact equality. Continue concrete, evidence-supported work under the bounded-campaign policy. If the slowdown cannot be resolved within scope, keep B explicitly experimental for adoption, retain the original framework path as the recommended/default method, and report the unmet performance requirement, investigated causes and remaining work. Do not bury the regression as a limitation while claiming the framework replacement is ready.
+
+### Preserve tool boundaries before combining tools
+
+Start with one node per original tool and retain that validated interface while working through straightforward optimizations that preserve those boundaries, such as avoiding repeated loading, allocation, metadata resolution or redundant calculations within a tool. Record the opportunities examined and why remaining ones are exhausted, rejected or require a boundary change. Combining tools is allowed only after that stage; it is not a shortcut around investigating ordinary overhead or a slower B path.
+
+Preserve and benchmark the last implementation with original tool boundaries. Treat each tool/node combination or split as a separate architectural experiment, with independent original-reference acceptance, relevant B/C integration checks and matched timing against that checkpoint. Explain any shared intermediate/cache ownership and changes in stage gates, status/error behavior or RNG sequencing. Keep tool combination distinct from later native multiple-output and array/batch changes so gains remain attributable; architecture changes must not weaken B's unchanged-configuration contract.
+
 ### Separate fixed and sample-dependent overhead
 
 When phase timings are unavailable, compare the original and replacement at a very small positive event count and at larger counts with the same configuration and state coverage. Record both event and object counts. Use matched repetitions and reversed/interleaved order or fresh reference brackets to expose drift. Record wall time and process CPU time, including worker descendants when the workflow launches subprocesses. Keep environment setup and validation consistently inside or outside the timer.
