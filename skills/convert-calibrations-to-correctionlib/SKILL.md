@@ -122,6 +122,8 @@ For an optimization campaign, keep one cumulative timing table from the initial 
 
 ## Deliver and preserve
 
+Write the report and talk as self-contained explanations for ATLAS colleagues who have not followed the work or this conversation. Explain the problem, final implementation, methods, results and limitations; define terms and A/B/C before relying on them. Revise the narrative when conclusions change rather than appending progress updates or unexplained references to earlier drafts. Keep editorial history in the task log. See [write for a reader new to the work](references/report-and-talk-guide.md#write-for-a-reader-new-to-the-work).
+
 Report the ROOT input read footprint: the number of distinct leaves loaded for the configured calibration and full-systematics recipe, and the average loaded data in KB/event. Retain the leaf inventory and byte-count evidence, distinguish compressed input from decoded data, and identify extra transport or diagnostic inputs. See [required ROOT input footprint](references/report-and-talk-guide.md#required-root-input-footprint-in-the-report).
 
 Include a profiling study of the final accepted workflow in the implementation report: a measured phase breakdown and native hotspot analysis explaining where time is spent, with scope, overhead and unresolved costs explicit. See the [required profiling study](references/report-and-talk-guide.md#required-profiling-study-in-the-report).
