@@ -1,22 +1,21 @@
 # ATLAS CP speed skill
 
-Agent instructions for converting ATLAS calibrations and systematic uncertainties to CorrectionLib, with shared CorrectionLib nodes, including custom C++ nodes, numerical validation and measured algorithmic optimization.
+Use [Convert Calibrations to CorrectionLib](skills/convert-calibrations-to-correctionlib/SKILL.md) to migrate ATLAS calibrations and systematic uncertainties to a shared CorrectionLib backend, validate against the original release tools, and measure the resulting workflows.
 
-Start with [the skill instructions](skills/convert-calibrations-to-correctionlib/SKILL.md). Supporting references cover [ATLAS integration](skills/convert-calibrations-to-correctionlib/references/atlas-lessons.md), [calculation design](skills/convert-calibrations-to-correctionlib/references/graph-design.md), [validation and timing](skills/convert-calibrations-to-correctionlib/references/validation-and-timing.md), [standalone packaging](skills/convert-calibrations-to-correctionlib/references/portable-demo.md), [reports and talks](skills/convert-calibrations-to-correctionlib/references/report-and-talk-guide.md) and [contributions](skills/convert-calibrations-to-correctionlib/references/contributing.md).
+Install the skill directory under `.agents/skills/` in your campaign checkout and invoke `$convert-calibrations-to-correctionlib` with the calibration scope. The current project workflow uses WSL `atlas_al9` with CVMFS-mounted AnalysisBase for authoritative builds and measurements, and a Windows checkout for reports, talk assets, and source inspection copies. Resolve the authoritative checkout, release, inputs, and CorrectionLib revision from the campaign handoff.
 
 ## Comparison paths
 
-- **A:** unchanged AnalysisBase from the release.
-- **B:** modified AnalysisBase using the shared correction backend and payloads.
-- **C:** columnar execution using the same backend as B.
+- **A** runs unmodified release AnalysisBase.
+- **B** runs the replacement in AnalysisBase with the existing analysis configuration.
+- **C** reads the original PHYSLITE file with uproot and runs the columnar workflow in Python.
 
-All three test from the same selected original PHYSLITE file, with B and C independently compared against A.
+All three use the same original PHYSLITE input. B and C use CorrectionLib as the runtime entry point for physics calculations, including any registered custom C++ nodes, and are independently compared against A. Campaign calibration and benchmarking use one CPU and one execution thread unless requested otherwise.
 
-## Current implementation policy
+## Reference guides
 
-- The outputs must remain the same. Small variations (due to different random number generators, for example, are acceptable).
-- CorrectionLib must be the runtime entry point for all physics calculations in paths B and C. Use existing nodes or implement new registered nodes; custom C++ and numerical libraries execute behind those nodes. Adapters handle input/output plumbing. See the [skill's governing rule](skills/convert-calibrations-to-correctionlib/SKILL.md) for the boundary.
-- All testing occurs in a single CPU - do not run anything in parallel.
-- If you find source bugs, keep the behavior and record the evidence in the task log.
-- Optimize for speed in the columnar version.
-- Once done optimizing, build a wheel that can be installed in a stand-alone environment (e.g. without `asetup` or similar) and can run the corrections.
+- [AnalysisBase discovery](skills/convert-calibrations-to-correctionlib/references/analysisbase-discovery.md) and [ATLAS numerical guidance](skills/convert-calibrations-to-correctionlib/references/atlas-lessons.md)
+- [Correction graph design](skills/convert-calibrations-to-correctionlib/references/graph-design.md) and [validation and timing](skills/convert-calibrations-to-correctionlib/references/validation-and-timing.md)
+- [Campaign reuse and optimization](skills/convert-calibrations-to-correctionlib/references/efficient-campaigns.md) and [profiling](skills/convert-calibrations-to-correctionlib/references/profiling.md)
+- [Standalone packaging](skills/convert-calibrations-to-correctionlib/references/portable-demo.md) and [reports and talks](skills/convert-calibrations-to-correctionlib/references/report-and-talk-guide.md)
+- [Maintaining the skill](skills/convert-calibrations-to-correctionlib/references/contributing.md)
