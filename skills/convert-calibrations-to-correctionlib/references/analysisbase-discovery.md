@@ -17,7 +17,7 @@ command -v CPRun.py
 CPRun.py --help
 ```
 
-Replace RELEASE with the selected and recorded version; AnalysisBase 25.2.117 was the campaign's tested version, not a permanent default. Check setup success before proceeding. Missing CVMFS or an unavailable platform/release is an environment prerequisite failure, not a calibration failure. Record the actual Python, compiler, ROOT and release paths. The release Python is the appropriate starting point for PyROOT; an unrelated virtualenv may be incompatible. Do not apply standalone CPython requirements to the original release.
+Replace RELEASE with the selected and recorded version. Check setup success before proceeding. Missing CVMFS or an unavailable platform/release is an environment prerequisite failure, not a calibration failure. Record the actual Python, compiler, ROOT and release paths. The release Python is the appropriate starting point for PyROOT; an unrelated virtualenv may be incompatible. Do not apply standalone CPython requirements to the original release.
 
 The observed CPRun interface supports this smoke-run shape; verify flags against the selected release's help:
 
@@ -38,32 +38,28 @@ Use a fresh result directory, inspect the log and output, then run the required 
 There is no universal YAML that means every systematic for every object. A job can enable systematics while a tool uses a reduced uncertainty representation or a stage is disabled.
 
 1. Read the existing analysis YAML and its input/campaign settings first. If it contains only another object, explicitly establish the new object's working scope; do not call inferred working points existing defaults.
-2. Locate the selected release's object configuration module. For example, after setup:
-   ```bash
-   python -c 'import MuonAnalysisAlgorithms.MuonAnalysisConfig as m; print(m.__file__)'
-   ```
-   Inspect its option declarations, defaults and algorithm/tool creation. For other objects, discover the corresponding package under the release's analysis algorithms rather than assuming identical option names.
+2. Find the package for the requested object under the selected release's analysis algorithms. Locate the configuration module in the active runtime and inspect its option declarations, defaults and algorithm/tool creation.
 3. Follow common services and configuration registration as well as the object module. Determine which options control systematic execution, recalibration of PHYSLITE, efficiency weights, detailed nuisance parameters and filters. Follow properties into the actual initialized tool and calibration recommendation.
 4. Capture resolved properties and the registered systematic names after initialization, using the framework's systematics output/metadata and tool interfaces where available. Keep nominal, kinematic and weight-only states distinct. Cross-check that expected output branches/categories are produced. Do not infer the list from a filename or a single boolean.
 5. Freeze the configuration, source/recommendation identities and enumerated states before recording the full reference. Data/MC, working point, release, calibration files and correlation model can all change the list.
 
-For a concrete discovery example, the inspected muon module in AnalysisBase 25.2.117 declared `systematicBreakdown` with default false and described true as one efficiency nuisance parameter per uncertainty source. The campaign therefore explicitly set:
+Verify global execution and each tool's uncertainty configuration from the selected release. Full systematic coverage means the requested initialized prescription. Consult earlier worked configurations only when the campaign's reuse rules permit them.
 
-```yaml
-CommonServices:
-  runSystematics: true
-  systematicsHistogram: systematics
-Muons:
-  - containerName: AnaMuons
-    recalibratePhyslite: true
-    WorkingPoint:
-      - selectionName: medium
-        quality: Medium
-        isolation: Loose_VarRad
-        systematicBreakdown: true
-```
+## Distinguish systematic scope and alternative models
 
-This is a configuration fragment illustrating the two distinct controls, not a complete runnable configuration or a universal muon prescription. Add the required output and sample-specific configuration; verify options against the chosen release. Do not transplant these working points or option names into electrons/jets. Full systematic coverage means the requested initialized prescription, not every optional tool or working point in the release.
+Treat **available** as an explicitly defined inventory (for example source/data-file components or supported alternative models), not a universal API or one executable uncertainty prescription. Query **affecting** and **recommended** states from each initialized tool: the first describes what that instance accepts as affecting it, while the second describes its recommended set under the selected settings. Neither guarantees a nonzero effect on every object. Establish the **configured/executed** set by tracing enabled stages, resolved properties, service enumeration, filters, input dependencies and output coverage. In the inspected AnalysisBase service, recommended states drive ordinary enumeration; affecting states alone do not cause execution. Record nominal and weight-only outputs separately from kinematic shifts.
+
+Resolve the actual scope of a setting such as `AllSys` in the pinned release. A scheme may select a decorrelated representation in place of a correlated variation and may act on only one tool. Inspect global execution, tool enablement, correlation choices and per-tool uncertainty breakdown separately. For example, in AnalysisBase 25.2.117, trace `AllSys` from the muon momentum configuration through `MuonCalibTool` to the scale/smear and sagitta tools. Record the initialized states for the chosen prescription and check other calibration tools independently.
+
+For a faithful conversion, preserve the requested initialized prescription in A/B/C. When the scope explicitly requires all supported alternatives, inventory omissions and test valid models or non-recommended diagnostic states in separately identified configurations. Do not combine alternative correlated/decorrelated bases or totals and their components as independent uncertainties; some tools reject such combinations, and broadening a state list can double count uncertainty. Check data/MC applicability, working points, calibration files, disabled stages, pseudo-data, filters and toy/ensemble handling. Capture initialized state lists and actual output/status coverage before claiming completeness. Static inspection establishes configuration semantics, not numerical acceptance of every setting; do not retroactively fail a previously satisfied frozen contract merely because a broader prescription exists.
+
+## Capture the original behavior
+
+Smoke-test the observer on real input and freeze the resolved configuration. Preserve object identity and order before thinning or sorting. Capture the exposed stages, calibrated values, selections, weights and statuses for the required state set. Use [independent acceptance](validation-and-timing.md#independent-authority) for the required identity, scope and comparison checks.
+
+Trace the active loading chain through defaults, resolver search paths, merge precedence and data objects. For each active stage, record inputs, types, units, calculation, constants, interpolation, boundaries, output and rounding. Identify stages that use the original object and those that use the recalibrated object. Record which features change under each variation. Confirm the actual execution path from the caller through bindings to the numerical implementation.
+
+Preserve observed source defects in the faithful conversion. Record a `BUG` entry with the source revision/location, trigger, observed behavior, evidence, and how parity is preserved. Distinguish suspected defects from confirmed ones. Intentional changes to the physics prescription beyond the authorized experimental stream require an explicit user decision.
 
 ## Source locations for documentation
 

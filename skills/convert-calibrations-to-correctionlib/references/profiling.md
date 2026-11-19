@@ -4,7 +4,7 @@ Read before investigating a performance bottleneck. Choose the least intrusive t
 
 ## Terms to define in reports
 
-**Sampled CPU share** estimates the fraction of recorded CPU observations at a function or stack; it is not a wall-time fraction and does not include time blocked waiting for I/O. **Self (exclusive) cost** counts samples executing inside a function itself, excluding functions it calls. **Inclusive cost** also includes its callees; inclusive rows overlap and must not be added. Neither term says how many CPUs were used. Define these terms next to the first profiling table in the report, using plain labels such as “exclusive share of sampled CPU time.” Keep unresolved function names distinct from known functions that have not been assigned to input/evaluation/output stages.
+**Sampled CPU share** estimates the fraction of recorded CPU observations at a function or stack; it is not a wall-time fraction and does not include time blocked waiting for I/O. **Self (exclusive) cost** counts samples executing inside a function itself, excluding functions it calls. **Inclusive cost** also includes its callees; inclusive rows overlap and must not be added. Neither term says how many CPUs were used. Define these terms next to the first table in the [supporting profiling study](report-and-talk-guide.md#required-profiling-study-in-the-supporting-evidence), using plain labels such as “exclusive share of sampled CPU time.” Keep unresolved function names distinct from known functions that have not been assigned to input/evaluation/output stages.
 
 ## Tool selection
 
@@ -19,11 +19,11 @@ Read before investigating a performance bottleneck. Choose the least intrusive t
 
 ## Recommended sequence
 
-1. Retain a validated, uninstrumented baseline and inspect coarse phase times.
-2. Use one short representative Python profile if ownership of the cost is unclear. Once most time is inside native evaluation, stop refining the Python profile to explain C++ stages.
-3. Check native sampling availability before building a custom profiler. Start with a modest sampling rate and inspect whether the actual worker/provider appears with useful symbols.
-4. Add only the counters or coarse native scopes needed to distinguish the remaining hypotheses. Prefer counts for tiny repeated operations.
-5. Validate instrumented outputs against the accepted implementation, then remove/disable instrumentation for repeated performance measurements. Keep all diagnostic results separate from the timing ledger's production measurements.
+1. Preserve a validated, uninstrumented baseline and start with the [initial architecture review](validation-and-timing.md#explore-and-benchmark-architectural-refactors). Use a short baseline diagnostic if coarse times and counts leave a specific issue unresolved. Apply clear simplifications, then profile the resulting workflow under representative nominal and full-systematics workloads.
+2. Measure elapsed times by phase and tool alongside process CPU time, including the analysis processes that do the work. Use a short representative Python profile when Python ownership of a cost is unclear.
+3. Collect native CPU samples and call stacks for attribution to functions, call paths and operations within tools. Check sampling and symbol quality on the actual worker/provider. Collect hardware counts such as cycles and retired instructions when supported. Record the metric, scope and availability, and use software CPU sampling or targeted instrumentation when hardware events are unavailable.
+4. Add targeted call, copy or allocation counts and timing scopes when needed to explain why a cost recurs. Use the profile and call graph together to evaluate end-to-end architectural fixes before pursuing local hotspots. Recheck the cost distribution after material changes.
+5. Validate instrumented outputs against the accepted implementation, then remove or disable instrumentation for repeated performance measurements. Keep all diagnostic results separate from the timing ledger's production measurements.
 
 A useful Python invocation, using the same interpreter/environment as the analysis:
 

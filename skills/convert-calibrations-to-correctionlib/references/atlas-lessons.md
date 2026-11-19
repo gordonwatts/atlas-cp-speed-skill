@@ -10,7 +10,7 @@ Read [AnalysisBase setup and configuration discovery](analysisbase-discovery.md)
 - **B — modified AnalysisBase:** integrate the conversion and accepted optimizations through the original framework interfaces, using the same shared correction calculation code and CorrectionLib payloads as C. C++ physics must execute behind the same registered CorrectionLib nodes used by C; framework adapters provide input/output plumbing.
 - **C — columnar:** read original PHYSLITE columns independently and call the shared backend used by B, preserving event boundaries, identities and source precision.
 
-All three paths must read the same selected original PHYSLITE file for testing, with matched event ranges and resolved correction/systematic configuration. Continue using the file already selected in the project's configuration; resolve and record its full identity rather than changing it during this skill cleanup. For discovery in this project, the existing selection was resolved through TestFileLiteR3MC.txt for Run-3 FullSim ttbar dataset 601229, PHYSLITE p7266; this is an input locator, not a numerical acceptance result or a requirement for every future calibration.
+Use the original PHYSLITE input chosen for the current campaign. Resolve and record its full identity from the current handoff or configuration. A, B and C must read the same original file with matched event ranges and resolved correction and systematic configuration.
 
 Compare B and C independently against A. B/C agreement is useful integration evidence but cannot replace the original-tool oracle. Keep the release and replacement library environments separate. Use one CPU and one execution thread unless the user explicitly requests parallelization. A standalone C test must use CPython 3.14 without the release setup.
 
@@ -32,6 +32,14 @@ Compare B and C independently against A. B/C agreement is useful integration evi
 - Determine whether truth matching uses original or recalibrated directions. Preserve source thresholds, wrapping, float rounding and operation order.
 - For failing-object weights, inspect expressions such as (1 - SF * efficiency)/(1 - efficiency), variations of both inputs, validity and event-product exclusions.
 - Boundary probes complement ordinary PHYSLITE samples. Mark suspected source defects with BUG in the task log and preserve their behavior under the conversion policy.
+
+## Authorized random-stream changes and ROOT removal
+
+The experimental ROOT-free campaign authorizes the stream described in the [packaging guide](portable-demo.md#deliver-a-root-free-python-package). Preserve an accepted original-stream checkpoint first and report the changed-stream variant separately. Replace unrelated numerical dependencies separately and compare their source-equivalent operations against the original, including float rounding, operation order, zero vectors, negative mass conventions and singular pseudorapidity encodings. Algebraic simplifications such as replacing a vector theta calculation with an eta identity can alter rounding.
+
+Version the changed stream in the node/payload contract. Specify engine rounds, key/counter mapping, word order, uniform/Gaussian precision, spare-value caching, reseeding, zero/out-of-range seeds and reuse across systematic states. Counter-based engines do not by themselves guarantee unchanged event-level values or cross-platform bitwise Gaussian results. Validate upstream known answers, adapter replay/reseed behavior, observed seed domains, distribution/tail checks and cross-draw correlations. Test systematic, chunk and ordering invariance in the real recipe. Distinguish these finite-sample checks from physics certification and exact original-tool agreement; never silently widen the old agreement claim.
+
+Removing an RNG dependency does not establish ROOT-free execution. Inventory vectors, angle/energy operations, histograms, transitive ELF dependencies, preload configuration and runtime resources. Keep reference/conversion-only ROOT tools optional and outside the installed runtime closure. Inspect the final installed wheel and actual loaded libraries in a release-independent environment, then validate both framework and columnar execution using the same changed prescription.
 
 ## Framework and tooling boundaries
 
